@@ -7,8 +7,6 @@ import { DistrictSelect } from "@/components/district-select";
 import { RoadCombobox } from "@/components/road-combobox";
 import { AddressDetailInputs } from "@/components/address-detail-inputs";
 import { ResultCard } from "@/components/result-card";
-import { Button } from "@/components/ui/button";
-import { RotateCcw } from "lucide-react";
 
 interface AddressFormProps {
   cities: City[];
@@ -28,25 +26,16 @@ export function AddressForm({ cities }: AddressFormProps) {
   } = useAddressState();
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
+    <div className="space-y-6">
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium text-muted-foreground">
-            {"地址輸入"}
-          </h3>
-          <Button variant="ghost" size="sm" onClick={reset}>
-            <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
-            {"重設"}
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-2 gap-3">
           <CitySelect
             cities={cities}
             value={state.city}
             onChange={setCity}
           />
           <DistrictSelect
+            key={state.city?.name ?? "empty"}
             districts={state.city?.districts ?? []}
             value={state.district}
             onChange={setDistrict}
@@ -55,6 +44,7 @@ export function AddressForm({ cities }: AddressFormProps) {
         </div>
 
         <RoadCombobox
+          key={state.district?.zip3 ?? "empty"}
           roads={state.roads}
           value={state.road}
           onChange={setRoad}
@@ -66,10 +56,16 @@ export function AddressForm({ cities }: AddressFormProps) {
           values={state.detail}
           onChange={setDetail}
           disabled={!state.road}
+          onReset={reset}
         />
       </div>
 
       <div>
+        <div className="mb-3">
+          <span className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+            {"查詢結果"}
+          </span>
+        </div>
         <ResultCard
           englishAddress={englishAddress}
           zip6={zip6}

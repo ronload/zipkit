@@ -36,13 +36,13 @@ export function RoadCombobox({
 
   return (
     <div className="space-y-1.5">
-      <label className="text-sm font-medium">
+      <label className="text-[11px] font-medium text-muted-foreground">
         {"路/街"}
       </label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           disabled={disabled || loading}
-          className="flex h-8 w-full items-center justify-between rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30 dark:hover:bg-input/50"
+          className="flex h-8 w-full items-center justify-between rounded-lg border border-input bg-transparent px-2.5 text-base transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30 dark:hover:bg-input/50"
         >
           {loading ? (
             <span className="flex items-center gap-2 text-muted-foreground">
@@ -51,12 +51,12 @@ export function RoadCombobox({
             </span>
           ) : value ? (
             <span className="truncate text-left">
-              {value.name} ({value.en})
+              {value.name}
             </span>
           ) : (
             <span className="text-muted-foreground">{"請選擇路/街..."}</span>
           )}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-40" />
         </PopoverTrigger>
         <PopoverContent className="w-(--anchor-width) p-0">
           <Command>
@@ -74,10 +74,7 @@ export function RoadCombobox({
                     }}
                     data-checked={value?.name === road.name ? true : undefined}
                   >
-                    <span>{road.name}</span>
-                    <span className="ml-auto text-xs text-muted-foreground">
-                      {road.en}
-                    </span>
+                    {road.name}
                   </CommandItem>
                 ))}
               </CommandGroup>
