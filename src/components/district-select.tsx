@@ -24,24 +24,24 @@ export function DistrictSelect({
 }: DistrictSelectProps) {
   return (
     <div className="space-y-1.5">
-      <label className="text-sm font-medium">
+      <label className="text-[11px] font-medium text-muted-foreground">
         {"鄉鎮市區"}
       </label>
       <Select
-        value={value?.zip3 ?? null}
-        onValueChange={(zip3) => {
-          const district = districts.find((d) => d.zip3 === zip3) ?? null;
+        value={value?.name ?? null}
+        onValueChange={(name) => {
+          const district = districts.find((d) => d.name === name) ?? null;
           onChange(district);
         }}
         disabled={disabled}
       >
-        <SelectTrigger className="w-full">
+        <SelectTrigger className="w-full text-base">
           <SelectValue placeholder={"請選擇鄉鎮市區..."} />
         </SelectTrigger>
         <SelectContent>
           {districts.map((d) => (
-            <SelectItem key={d.zip3} value={d.zip3}>
-              {d.name} {d.en}
+            <SelectItem key={d.name} value={d.name}>
+              {d.name}
             </SelectItem>
           ))}
         </SelectContent>

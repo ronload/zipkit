@@ -1,9 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Copy } from "lucide-react";
+import { Copy, Check } from "lucide-react";
 
 interface ResultCardProps {
   englishAddress: string;
@@ -11,103 +10,83 @@ interface ResultCardProps {
   zip3: string | null;
 }
 
-function copyToClipboard(text: string, label: string) {
-  navigator.clipboard.writeText(text).then(() => {
-    toast.success(label);
-  });
+function CopyButton({ text, label }: { text: string; label: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      toast.success(label);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+    >
+      {copied ? (
+        <Check className="h-3.5 w-3.5 text-primary" />
+      ) : (
+        <Copy className="h-3.5 w-3.5" />
+      )}
+    </button>
+  );
 }
 
 export function ResultCard({ englishAddress, zip6, zip3 }: ResultCardProps) {
-  if (!englishAddress && !zip3) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">{"查詢結果"}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            {"請先選擇地址以查看英譯結果與郵遞區號。"}
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{"查詢結果"}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {englishAddress && (
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground tracking-wide">
-                {"英文地址"}
-              </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6"
-                onClick={() => copyToClipboard(englishAddress, "已複製英文地址")}
-              >
-                <Copy className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-            <p className="text-sm font-medium leading-relaxed break-all">
-              {englishAddress}
-            </p>
-          </div>
-        )}
+    <div className="divide-y divide-border/40 rounded-lg border border-border/60">
+      <div className="p-4">
+        <div className="mb-2 flex h-6 items-center justify-between">
+          <span className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+            {"英文地址"}
+          </span>
+          {englishAddress && (
+            <CopyButton text={englishAddress} label={"已複製英文地址"} />
+          )}
+        </div>
+        <p className="min-h-[4.875rem] text-base font-medium leading-relaxed tracking-wide">
+          {englishAddress}
+        </p>
+      </div>
 
-        {zip3 && (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-muted-foreground tracking-wide">
-                  {"3+3 郵遞區號"}
-                </span>
-                {zip6 && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={() =>
-                      copyToClipboard(zip6, "已複製 3+3 郵遞區號")
-                    }
-                  >
-                    <Copy className="h-3.5 w-3.5" />
-                  </Button>
-                )}
-              </div>
-              <p className="text-lg font-mono font-semibold">
-                {zip6 ?? (
-                  <span className="text-sm text-muted-foreground font-normal">
-                    {"請輸入門牌號碼查詢"}
-                  </span>
-                )}
-              </p>
-            </div>
-
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-muted-foreground tracking-wide">
-                  {"3 碼郵遞區號"}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6"
-                  onClick={() => copyToClipboard(zip3, "已複製郵遞區號")}
-                >
-                  <Copy className="h-3.5 w-3.5" />
-                </Button>
-              </div>
-              <p className="text-lg font-mono font-semibold">{zip3}</p>
-            </div>
+      <div className="grid grid-cols-2 divide-x divide-border/40">
+        <div className="p-4">
+          <div className="mb-2 flex h-6 items-center justify-between">
+            <span className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+              {"3+3 郵遞區號"}
+            </span>
+            {zip6 && (
+              <CopyButton text={zip6} label={"已複製 3+3 郵遞區號"} />
+            )}
           </div>
-        )}
-      </CardContent>
-    </Card>
+          <p className="font-mono text-xl font-semibold tracking-wider tabular-nums">
+            {zip6 ? (
+              <>
+                <span className="text-foreground">{zip6.slice(0, 3)}</span>
+                <span className="text-primary">{zip6.slice(3)}</span>
+              </>
+            ) : (
+              <span className="invisible">000000</span>
+            )}
+          </p>
+        </div>
+        <div className="p-4">
+          <div className="mb-2 flex h-6 items-center justify-between">
+            <span className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+              {"3 碼"}
+            </span>
+            {zip3 && (
+              <CopyButton text={zip3} label={"已複製郵遞區號"} />
+            )}
+          </div>
+          <p className="font-mono text-xl font-semibold tracking-wider tabular-nums">
+            {zip3 || <span className="invisible">000</span>}
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }

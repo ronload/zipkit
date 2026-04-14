@@ -18,7 +18,7 @@ interface CitySelectProps {
 export function CitySelect({ cities, value, onChange }: CitySelectProps) {
   return (
     <div className="space-y-1.5">
-      <label className="text-sm font-medium">
+      <label className="text-[11px] font-medium text-muted-foreground">
         {"縣市"}
       </label>
       <Select
@@ -28,13 +28,13 @@ export function CitySelect({ cities, value, onChange }: CitySelectProps) {
           onChange(city);
         }}
       >
-        <SelectTrigger className="w-full">
+        <SelectTrigger className="w-full text-base">
           <SelectValue placeholder={"請選擇縣市..."} />
         </SelectTrigger>
         <SelectContent>
           {cities.map((city) => (
             <SelectItem key={city.name} value={city.name}>
-              {city.name} {city.en}
+              {city.name}
             </SelectItem>
           ))}
         </SelectContent>
