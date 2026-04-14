@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# AI code assistants
+.claude
+CLAUDE.md
+AGENT.md
+.cursor
+
+# ETL raw data
+scripts/raw/
