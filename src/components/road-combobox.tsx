@@ -50,10 +50,7 @@ export function RoadCombobox({
             );
           }}
         >
-          <ComboboxInput
-            placeholder={"請選擇路/街..."}
-            disabled={disabled}
-          />
+          <ComboboxInput placeholder={"請選擇路/街..."} disabled={disabled} />
           <ComboboxContent>
             <ComboboxEmpty>{"查無結果"}</ComboboxEmpty>
             <ComboboxList>
