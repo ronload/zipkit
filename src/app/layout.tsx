@@ -15,10 +15,46 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "zipkit | 台灣地址英譯 & 郵遞區號查詢",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "zipkit | 台灣地址英譯 & 郵遞區號查詢",
+    template: "%s | zipkit",
+  },
   description:
     "輸入台灣中文地址，一鍵取得標準英文地址與 3+3 郵遞區號。免驗證碼、純前端運算、零延遲。",
+  keywords: [
+    "台灣地址英譯",
+    "郵遞區號查詢",
+    "3+3郵遞區號",
+    "Taiwan address translation",
+    "zip code lookup",
+    "中文地址翻譯英文",
+    "郵遞區號",
+    "zipkit",
+  ],
+  authors: [{ name: "ronload", url: "https://github.com/ronload" }],
+  creator: "ronload",
+  openGraph: {
+    type: "website",
+    locale: "zh_TW",
+    siteName: "zipkit",
+    title: "zipkit | 台灣地址英譯 & 郵遞區號查詢",
+    description:
+      "輸入台灣中文地址，一鍵取得標準英文地址與 3+3 郵遞區號。免驗證碼、純前端運算、零延遲。",
+    url: SITE_URL,
+  },
+  twitter: {
+    card: "summary",
+    title: "zipkit | 台灣地址英譯 & 郵遞區號查詢",
+    description:
+      "輸入台灣中文地址，一鍵取得標準英文地址與 3+3 郵遞區號。免驗證碼、純前端運算、零延遲。",
+  },
+  alternates: {
+    canonical: SITE_URL,
+  },
 };
 
 export default function RootLayout({
