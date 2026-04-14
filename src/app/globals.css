@@ -158,16 +158,28 @@ body::after {
   z-index: -1;
   pointer-events: none;
   border-radius: 50%;
-  background: radial-gradient(ellipse, oklch(0.488 0.08 264 / 6%) 0%, transparent 70%);
+  background: radial-gradient(
+    ellipse,
+    oklch(0.488 0.08 264 / 6%) 0%,
+    transparent 70%
+  );
 }
 
 .dark body::after {
-  background: radial-gradient(ellipse, oklch(0.628 0.1 264 / 8%) 0%, transparent 70%);
+  background: radial-gradient(
+    ellipse,
+    oklch(0.628 0.1 264 / 8%) 0%,
+    transparent 70%
+  );
 }
 
 /* Refined transitions */
 @layer base {
-  button, a, input, select, [role="combobox"] {
+  button,
+  a,
+  input,
+  select,
+  [role="combobox"] {
     transition: all 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
   }
 }

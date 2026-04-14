@@ -19,17 +19,14 @@ const SKIP_CITIES = new Set(["釣魚臺", "南海島"]);
 
 export function parseAddressData(rawDir: string, outDir: string) {
   const cityData: RawCity[] = JSON.parse(
-    readFileSync(join(rawDir, "CityCountyData.json"), "utf-8")
+    readFileSync(join(rawDir, "CityCountyData.json"), "utf-8"),
   );
   const allData: RawCity[] = JSON.parse(
-    readFileSync(join(rawDir, "AllData.json"), "utf-8")
+    readFileSync(join(rawDir, "AllData.json"), "utf-8"),
   );
 
   // Build a road lookup from AllData indexed by zip3
-  const roadsByZip3 = new Map<
-    string,
-    { name: string; en: string }[]
-  >();
+  const roadsByZip3 = new Map<string, { name: string; en: string }[]>();
 
   for (const city of allData) {
     if (SKIP_CITIES.has(city.CityName)) continue;
@@ -60,7 +57,7 @@ export function parseAddressData(rawDir: string, outDir: string) {
 
   writeFileSync(join(outDir, "base.json"), JSON.stringify(base));
   console.log(
-    `base.json: ${base.cities.length} cities, ${base.cities.reduce((s, c) => s + c.districts.length, 0)} districts`
+    `base.json: ${base.cities.length} cities, ${base.cities.reduce((s, c) => s + c.districts.length, 0)} districts`,
   );
 
   // Generate per-district roads files
@@ -69,10 +66,7 @@ export function parseAddressData(rawDir: string, outDir: string) {
 
   let roadsFileCount = 0;
   for (const [zip3, roads] of roadsByZip3) {
-    writeFileSync(
-      join(roadsDir, `${zip3}.json`),
-      JSON.stringify({ roads })
-    );
+    writeFileSync(join(roadsDir, `${zip3}.json`), JSON.stringify({ roads }));
     roadsFileCount++;
   }
   console.log(`roads/: ${roadsFileCount} files generated`);
@@ -83,6 +77,6 @@ export function parseAddressData(rawDir: string, outDir: string) {
  */
 function normalizeRoadName(name: string): string {
   return name.replace(/[\uff10-\uff19]/g, (ch) =>
-    String.fromCharCode(ch.charCodeAt(0) - 0xfee0)
+    String.fromCharCode(ch.charCodeAt(0) - 0xfee0),
   );
 }

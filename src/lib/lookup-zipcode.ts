@@ -11,7 +11,7 @@ export function lookupZip6(
   alley: number,
   number: number,
   numberSub: number,
-  floor: number
+  floor: number,
 ): string | null {
   // Filter ranges for this road
   const roadRanges = ranges.filter((r) => r.road === roadName);
@@ -37,7 +37,8 @@ function specificity(range: ZipRange): number {
   let score = 0;
   if (range.lane > 0) score += 100;
   if (range.alley > 0) score += 50;
-  if (range.numStart > 0 && range.numEnd > 0 && range.numEnd < 9999) score += 20;
+  if (range.numStart > 0 && range.numEnd > 0 && range.numEnd < 9999)
+    score += 20;
   if (range.even > 0) score += 10;
   if (range.floorStart > 0 || range.floorEnd > 0) score += 5;
   return score;
@@ -49,7 +50,7 @@ function matchesRange(
   alley: number,
   number: number,
   numberSub: number,
-  floor: number
+  floor: number,
 ): boolean {
   // Lane constraint
   // range.lane=0 means the range covers the entire road including all lanes

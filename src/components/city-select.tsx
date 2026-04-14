@@ -18,7 +18,7 @@ interface CitySelectProps {
 export function CitySelect({ cities, value, onChange }: CitySelectProps) {
   return (
     <div className="space-y-1.5">
-      <label className="text-[11px] font-medium text-muted-foreground">
+      <label className="text-muted-foreground text-[11px] font-medium">
         {"縣市"}
       </label>
       <Select
