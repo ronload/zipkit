@@ -38,7 +38,7 @@ export function DistrictSelect({
         <SelectTrigger className="w-full text-base">
           <SelectValue placeholder={"請選擇鄉鎮市區..."} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent align="start" alignItemWithTrigger={false}>
           {districts.map((d) => (
             <SelectItem key={d.name} value={d.name}>
               {d.name}

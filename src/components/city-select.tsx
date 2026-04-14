@@ -31,7 +31,7 @@ export function CitySelect({ cities, value, onChange }: CitySelectProps) {
         <SelectTrigger className="w-full text-base">
           <SelectValue placeholder={"請選擇縣市..."} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent align="start" alignItemWithTrigger={false}>
           {cities.map((city) => (
             <SelectItem key={city.name} value={city.name}>
               {city.name}
