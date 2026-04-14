@@ -52,26 +52,23 @@ function matchesRange(
   floor: number
 ): boolean {
   // Lane constraint
+  // range.lane=0 means the range covers the entire road including all lanes
   if (range.lane > 0) {
     if (range.lane1 > 0) {
       if (lane < range.lane || lane > range.lane1) return false;
     } else {
       if (lane !== range.lane) return false;
     }
-  } else if (lane > 0) {
-    // Range is for main road (no lane), but user specified a lane
-    return false;
   }
 
   // Alley constraint
+  // range.alley=0 means the range covers all alleys within the lane
   if (range.alley > 0) {
     if (range.alley1 > 0) {
       if (alley < range.alley || alley > range.alley1) return false;
     } else {
       if (alley !== range.alley) return false;
     }
-  } else if (alley > 0) {
-    return false;
   }
 
   // Even/odd constraint
