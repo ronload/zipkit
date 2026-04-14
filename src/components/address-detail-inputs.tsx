@@ -34,16 +34,16 @@ export function AddressDetailInputs({
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
       {fields.map((f) => (
         <div key={f.key} className="space-y-1.5">
-          <label className="text-[11px] font-medium text-muted-foreground">
+          <label className="text-muted-foreground text-[11px] font-medium">
             {f.label}
-            {f.required && (
-              <span className="ml-0.5 text-destructive">*</span>
-            )}
+            {f.required && <span className="text-destructive ml-0.5">*</span>}
           </label>
           <Input
             placeholder={f.placeholder}
             value={values[f.key]}
-            onChange={(e) => onChange(f.key, e.target.value)}
+            onChange={(e) => {
+              onChange(f.key, e.target.value);
+            }}
             disabled={disabled}
             className="text-base"
           />
@@ -52,7 +52,7 @@ export function AddressDetailInputs({
       <div className="flex items-end">
         <button
           onClick={onReset}
-          className="flex h-8 w-full items-center justify-center gap-1.5 rounded-lg border border-input text-base text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          className="border-input text-muted-foreground hover:bg-secondary hover:text-foreground flex h-8 w-full items-center justify-center gap-1.5 rounded-lg border text-base transition-colors"
         >
           <RotateCcw className="h-3.5 w-3.5" />
           {"重設"}
