@@ -75,7 +75,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <header className="border-border/50 bg-background/80 sticky top-0 z-40 h-12 border-b backdrop-blur-xl">
+          <header className="border-border/50 sticky top-0 z-40 h-12 backdrop-blur-xl">
             <div className="mx-auto flex h-full w-full max-w-3xl items-center justify-between px-4 sm:px-6">
               <div className="flex items-center gap-2">
                 <span className="text-lg font-semibold tracking-tight">
@@ -85,7 +85,7 @@ export default function RootLayout({
                   /
                 </span>
                 <span className="text-muted-foreground hidden text-base sm:inline">
-                  {"地址英譯"}
+                  {"地址英譯 & 郵遞區號"}
                 </span>
               </div>
               <div className="flex items-center gap-1">
