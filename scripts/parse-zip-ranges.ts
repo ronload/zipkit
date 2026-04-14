@@ -66,7 +66,7 @@ function parseCSVLine(raw: string): string[] {
  */
 function normalizeRoadName(name: string): string {
   return name.replace(/[\uff10-\uff19]/g, (ch) =>
-    String.fromCharCode(ch.charCodeAt(0) - 0xfee0)
+    String.fromCharCode(ch.charCodeAt(0) - 0xfee0),
   );
 }
 
@@ -135,14 +135,11 @@ export function parseZipRanges(rawDir: string, outDir: string) {
 
   let fileCount = 0;
   for (const [zip3, ranges] of rangesByZip3) {
-    writeFileSync(
-      join(zipDir, `${zip3}.json`),
-      JSON.stringify({ ranges })
-    );
+    writeFileSync(join(zipDir, `${zip3}.json`), JSON.stringify({ ranges }));
     fileCount++;
   }
 
   console.log(
-    `zip-ranges/: ${fileCount} files, ${parsed} records parsed, ${skipped} lines skipped`
+    `zip-ranges/: ${fileCount} files, ${parsed} records parsed, ${skipped} lines skipped`,
   );
 }

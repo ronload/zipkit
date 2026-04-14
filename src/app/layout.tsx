@@ -68,22 +68,22 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col">
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
-          <header className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-border/50 bg-background/80 px-4 backdrop-blur-xl sm:px-6">
+          <header className="border-border/50 bg-background/80 sticky top-0 z-40 flex h-12 items-center justify-between border-b px-4 backdrop-blur-xl sm:px-6">
             <div className="flex items-center gap-2">
               <span className="text-lg font-semibold tracking-tight">
                 zipkit
               </span>
-              <span className="hidden text-base text-muted-foreground sm:inline">
+              <span className="text-muted-foreground hidden text-base sm:inline">
                 /
               </span>
-              <span className="hidden text-base text-muted-foreground sm:inline">
+              <span className="text-muted-foreground hidden text-base sm:inline">
                 {"地址英譯"}
               </span>
             </div>
@@ -93,7 +93,7 @@ export default function RootLayout({
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub"
-                className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                className="text-muted-foreground hover:bg-secondary hover:text-foreground flex h-7 w-7 items-center justify-center rounded-md transition-colors"
               >
                 <svg
                   viewBox="0 0 16 16"
@@ -107,7 +107,7 @@ export default function RootLayout({
             </div>
           </header>
           <main className="flex-1">{children}</main>
-          <footer className="border-t border-border/50 px-4 py-3 text-xs text-muted-foreground/70 sm:px-6">
+          <footer className="border-border/50 text-muted-foreground/70 border-t px-4 py-3 text-xs sm:px-6">
             {"地址英譯僅供參考。資料來源：中華郵政。"}
           </footer>
           <Toaster

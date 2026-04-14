@@ -29,11 +29,7 @@ export function AddressForm({ cities }: AddressFormProps) {
     <div className="space-y-6">
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
-          <CitySelect
-            cities={cities}
-            value={state.city}
-            onChange={setCity}
-          />
+          <CitySelect cities={cities} value={state.city} onChange={setCity} />
           <DistrictSelect
             key={state.city?.name ?? "empty"}
             districts={state.city?.districts ?? []}
@@ -62,15 +58,11 @@ export function AddressForm({ cities }: AddressFormProps) {
 
       <div>
         <div className="mb-3">
-          <span className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+          <span className="text-muted-foreground text-[11px] font-medium tracking-widest uppercase">
             {"查詢結果"}
           </span>
         </div>
-        <ResultCard
-          englishAddress={englishAddress}
-          zip6={zip6}
-          zip3={zip3}
-        />
+        <ResultCard englishAddress={englishAddress} zip6={zip6} zip3={zip3} />
       </div>
     </div>
   );

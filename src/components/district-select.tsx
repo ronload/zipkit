@@ -24,7 +24,7 @@ export function DistrictSelect({
 }: DistrictSelectProps) {
   return (
     <div className="space-y-1.5">
-      <label className="text-[11px] font-medium text-muted-foreground">
+      <label className="text-muted-foreground text-[11px] font-medium">
         {"鄉鎮市區"}
       </label>
       <Select

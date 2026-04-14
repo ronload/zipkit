@@ -36,23 +36,21 @@ export function RoadCombobox({
 
   return (
     <div className="space-y-1.5">
-      <label className="text-[11px] font-medium text-muted-foreground">
+      <label className="text-muted-foreground text-[11px] font-medium">
         {"路/街"}
       </label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           disabled={disabled || loading}
-          className="flex h-8 w-full items-center justify-between rounded-lg border border-input bg-transparent px-2.5 text-base transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30 dark:hover:bg-input/50"
+          className="border-input focus-visible:border-ring focus-visible:ring-ring/50 dark:bg-input/30 dark:hover:bg-input/50 flex h-8 w-full items-center justify-between rounded-lg border bg-transparent px-2.5 text-base transition-colors outline-none select-none focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? (
-            <span className="flex items-center gap-2 text-muted-foreground">
+            <span className="text-muted-foreground flex items-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />
               {"載入中..."}
             </span>
           ) : value ? (
-            <span className="truncate text-left">
-              {value.name}
-            </span>
+            <span className="truncate text-left">{value.name}</span>
           ) : (
             <span className="text-muted-foreground">{"請選擇路/街..."}</span>
           )}
