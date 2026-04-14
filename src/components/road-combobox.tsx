@@ -40,7 +40,7 @@ export function RoadCombobox({
         <Combobox
           items={roads}
           value={value}
-          onValueChange={(val) => onChange(val ?? null)}
+          onValueChange={(val) => { onChange(val ?? null); }}
           itemToStringLabel={(road) => road.name}
           filter={(road, query) => {
             const q = query.toLowerCase();
