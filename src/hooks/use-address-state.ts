@@ -9,7 +9,10 @@ import type {
   ZipRange,
 } from "@/lib/types";
 import { loadRoads, loadZipRanges } from "@/lib/data-loader";
-import { formatEnglishAddress, parseNumber } from "@/lib/format-english-address";
+import {
+  formatEnglishAddress,
+  parseNumber,
+} from "@/lib/format-english-address";
 import { lookupZip6 } from "@/lib/lookup-zipcode";
 
 const EMPTY_DETAIL: AddressDetail = {
@@ -109,11 +112,11 @@ export function useAddressState() {
     dispatch({ type: "SET_ROADS_LOADING", payload: true });
     dispatch({ type: "SET_ZIP_RANGES_LOADING", payload: true });
 
-    loadRoads(zip3).then((roads) => {
+    void loadRoads(zip3).then((roads) => {
       if (!cancelled) dispatch({ type: "SET_ROADS", payload: roads });
     });
 
-    loadZipRanges(zip3).then((ranges) => {
+    void loadZipRanges(zip3).then((ranges) => {
       if (!cancelled) dispatch({ type: "SET_ZIP_RANGES", payload: ranges });
     });
 
@@ -129,7 +132,7 @@ export function useAddressState() {
       state.city,
       state.district,
       state.road,
-      state.detail
+      state.detail,
     );
   }, [state.city, state.district, state.road, state.detail]);
 
@@ -148,29 +151,25 @@ export function useAddressState() {
       parseInt(state.detail.alley, 10) || 0,
       num,
       sub,
-      parseInt(state.detail.floor, 10) || 0
+      parseInt(state.detail.floor, 10) || 0,
     );
   }, [state.road, state.zipRanges, state.detail]);
 
-  const setCity = useCallback(
-    (city: City | null) => dispatch({ type: "SET_CITY", payload: city }),
-    []
-  );
-  const setDistrict = useCallback(
-    (district: District | null) =>
-      dispatch({ type: "SET_DISTRICT", payload: district }),
-    []
-  );
-  const setRoad = useCallback(
-    (road: Road | null) => dispatch({ type: "SET_ROAD", payload: road }),
-    []
-  );
-  const setDetail = useCallback(
-    (field: keyof AddressDetail, value: string) =>
-      dispatch({ type: "SET_DETAIL", field, value }),
-    []
-  );
-  const reset = useCallback(() => dispatch({ type: "RESET" }), []);
+  const setCity = useCallback((city: City | null) => {
+    dispatch({ type: "SET_CITY", payload: city });
+  }, []);
+  const setDistrict = useCallback((district: District | null) => {
+    dispatch({ type: "SET_DISTRICT", payload: district });
+  }, []);
+  const setRoad = useCallback((road: Road | null) => {
+    dispatch({ type: "SET_ROAD", payload: road });
+  }, []);
+  const setDetail = useCallback((field: keyof AddressDetail, value: string) => {
+    dispatch({ type: "SET_DETAIL", field, value });
+  }, []);
+  const reset = useCallback(() => {
+    dispatch({ type: "RESET" });
+  }, []);
 
   return {
     state,

@@ -6,7 +6,7 @@ import type { City, District, Road, AddressDetail } from "./types";
  */
 export function parseNumber(input: string): { number: number; sub: number } {
   const trimmed = input.trim();
-  const match = trimmed.match(/^(\d+)(?:之(\d+))?$/);
+  const match = /^(\d+)(?:之(\d+))?$/.exec(trimmed);
   if (!match) return { number: 0, sub: 0 };
   return {
     number: parseInt(match[1], 10),
@@ -22,7 +22,7 @@ export function formatEnglishAddress(
   city: City,
   district: District,
   road: Road,
-  detail: AddressDetail
+  detail: AddressDetail,
 ): string {
   const parts: string[] = [];
 
