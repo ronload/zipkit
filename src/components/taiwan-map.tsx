@@ -61,6 +61,40 @@ const themeColors = {
   },
 };
 
+// Replace {name_en} with {name} in text-field values to show local language labels
+function replaceNameField(value: unknown): unknown {
+  if (typeof value === "string") {
+    return value.replace(/\{name_en\}/g, "{name}");
+  }
+  if (Array.isArray(value)) {
+    return value.map(replaceNameField);
+  }
+  if (value !== null && typeof value === "object") {
+    const obj = value as Record<string, unknown>;
+    const result: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(obj)) {
+      result[k] = replaceNameField(v);
+    }
+    return result;
+  }
+  return value;
+}
+
+function setMapLabelsToLocal(map: maplibregl.Map) {
+  const { layers } = map.getStyle();
+
+  for (const layer of layers) {
+    if (layer.type !== "symbol") continue;
+    const textField: unknown = map.getLayoutProperty(layer.id, "text-field");
+    if (!textField) continue;
+
+    const replaced = replaceNameField(textField);
+    if (JSON.stringify(replaced) !== JSON.stringify(textField)) {
+      map.setLayoutProperty(layer.id, "text-field", replaced);
+    }
+  }
+}
+
 function applyLayerColors(map: maplibregl.Map, theme: Theme) {
   const colors = themeColors[theme];
   if (map.getLayer(COUNTIES_LINE)) {
@@ -160,6 +194,21 @@ function MapLayers({
   const [townsData, setTownsData] = useState<FeatureCollection | null>(null);
   const townsTopologyRef = useRef<Topology | null>(null);
   const townsLoadedForRef = useRef<string | null>(null);
+
+  // Set map labels to local language (Chinese for Taiwan)
+  useEffect(() => {
+    if (!map || !isLoaded) return;
+
+    const applyLanguage = () => {
+      setMapLabelsToLocal(map);
+    };
+    applyLanguage();
+    map.on("style.load", applyLanguage);
+
+    return () => {
+      map.off("style.load", applyLanguage);
+    };
+  }, [map, isLoaded]);
 
   // Load counties data (one-time)
   useEffect(() => {
