@@ -1,30 +1,29 @@
 "use client";
 
 import type { City } from "@/lib/types";
-import { useAddressState } from "@/hooks/use-address-state";
+import type { useAddressState } from "@/hooks/use-address-state";
 import { CitySelect } from "@/components/city-select";
 import { DistrictSelect } from "@/components/district-select";
 import { RoadCombobox } from "@/components/road-combobox";
 import { AddressDetailInputs } from "@/components/address-detail-inputs";
 import { ResultCard } from "@/components/result-card";
 
-interface AddressFormProps {
+type AddressFormProps = {
   cities: City[];
-}
+} & ReturnType<typeof useAddressState>;
 
-export function AddressForm({ cities }: AddressFormProps) {
-  const {
-    state,
-    setCity,
-    setDistrict,
-    setRoad,
-    setDetail,
-    reset,
-    englishAddress,
-    zip3,
-    zip6,
-  } = useAddressState();
-
+export function AddressForm({
+  cities,
+  state,
+  setCity,
+  setDistrict,
+  setRoad,
+  setDetail,
+  reset,
+  englishAddress,
+  zip3,
+  zip6,
+}: AddressFormProps) {
   return (
     <div className="space-y-6">
       <div className="space-y-4">
