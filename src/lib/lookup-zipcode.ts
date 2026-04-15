@@ -18,11 +18,7 @@ export function lookupZip6(
   if (roadRanges.length === 0) return null;
 
   // Sort by specificity: more constraints = more specific = higher priority
-  const sorted = roadRanges.sort((a, b) => {
-    const specA = specificity(a);
-    const specB = specificity(b);
-    return specB - specA;
-  });
+  const sorted = roadRanges.toSorted((a, b) => specificity(b) - specificity(a));
 
   for (const range of sorted) {
     if (matchesRange(range, lane, alley, number, numberSub, floor)) {
