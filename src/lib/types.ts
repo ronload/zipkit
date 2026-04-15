@@ -38,10 +38,3 @@ export interface AddressDetail {
   floor: string;
   room: string;
 }
-
-export interface AddressState {
-  city: City | null;
-  district: District | null;
-  road: Road | null;
-  detail: AddressDetail;
-}

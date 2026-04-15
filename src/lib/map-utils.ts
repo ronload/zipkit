@@ -2,33 +2,6 @@ import type { Feature, Position, Polygon, MultiPolygon } from "geojson";
 import type { LngLatBoundsLike } from "maplibre-gl";
 
 /**
- * Compute the centroid of a GeoJSON Polygon or MultiPolygon feature
- * by averaging all coordinates in the outer ring(s).
- */
-export function computeCentroid(feature: Feature): [number, number] {
-  const geometry = feature.geometry as Polygon | MultiPolygon;
-  const coords: Position[] = [];
-
-  if (geometry.type === "Polygon") {
-    coords.push(...geometry.coordinates[0]);
-  } else {
-    for (const polygon of geometry.coordinates) {
-      coords.push(...polygon[0]);
-    }
-  }
-
-  if (coords.length === 0) return [121.0, 23.5];
-
-  let sumLng = 0;
-  let sumLat = 0;
-  for (const [lng, lat] of coords) {
-    sumLng += lng;
-    sumLat += lat;
-  }
-  return [sumLng / coords.length, sumLat / coords.length];
-}
-
-/**
  * Compute the bounding box of a set of GeoJSON features.
  */
 export function computeBounds(features: Feature[]): LngLatBoundsLike {
