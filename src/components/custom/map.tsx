@@ -1,15 +1,20 @@
 "use client";
 
-import { createContext, useContext, useLayoutEffect, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useLayoutEffect,
+  type ReactNode,
+} from "react";
 import { useTheme } from "next-themes";
 import { Map as BaseMap, useMap as useBaseMap } from "@/components/ui/map";
 import { proxyCartoUrl, neutralizeMapColors } from "@/lib/map-proxy";
 
 type Theme = "light" | "dark";
 
-type CustomMapContextValue = {
+interface CustomMapContextValue {
   resolvedTheme: Theme;
-};
+}
 
 const CustomMapContext = createContext<CustomMapContextValue>({
   resolvedTheme: "light",
