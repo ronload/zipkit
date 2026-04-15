@@ -39,7 +39,7 @@ function CopyButton({ text, label }: { text: string; label: string }) {
 
 export function ResultCard({ englishAddress, zip6, zip3 }: ResultCardProps) {
   return (
-    <div className="divide-border/40 border-border/60 divide-y rounded-lg border">
+    <div className="divide-border/40 border-input dark:bg-input/30 divide-y rounded-lg border">
       <div className="p-4">
         <div className="mb-2 flex h-6 items-center justify-between">
           <span className="text-muted-foreground text-[11px] font-medium tracking-widest uppercase">
