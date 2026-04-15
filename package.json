@@ -12,7 +12,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "tsc --noEmit && eslint && prettier --check .",
-    "etl": "tsx scripts/etl.ts"
+    "etl": "tsx scripts/etl.ts",
+    "shadcn:diff": "for f in src/components/ui/*.tsx; do name=$(basename \"$f\" .tsx); echo \"=== $name ===\"; pnpm shadcn add \"$name\" --diff 2>&1 || pnpm shadcn add \"@mapcn/$name\" --diff 2>&1; echo; done",
+    "shadcn:update": "for f in src/components/ui/*.tsx; do name=$(basename \"$f\" .tsx); pnpm shadcn add \"$name\" --overwrite 2>&1 || pnpm shadcn add \"@mapcn/$name\" --overwrite 2>&1; done"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.0",
