@@ -8,16 +8,15 @@ import { AddressForm } from "@/components/address-form";
 
 // Module-level: start downloading the map chunk during hydration (before any
 // useEffect fires). Only on desktop to avoid wasting mobile bandwidth.
+// The bundler caches the module, so subsequent import() calls in useEffect
+// resolve instantly without an extra network request.
 // Also prime the HTTP cache for counties data in parallel.
 const isDesktopAtLoad =
   typeof window !== "undefined" &&
   window.matchMedia("(min-width: 1024px)").matches;
 
-const mapModulePromise = isDesktopAtLoad
-  ? import("@/components/taiwan-map")
-  : null;
-
 if (isDesktopAtLoad) {
+  void import("@/components/taiwan-map");
   void fetch("/data/map/counties-10t.json");
 }
 
@@ -40,15 +39,23 @@ export function AddressPage({ cities }: AddressPageProps) {
 
     let cancelled = false;
 
-    // If the module-level preload started, reuse that promise;
-    // otherwise start a fresh download (e.g. viewport was resized to desktop).
-    const promise = mapModulePromise ?? import("@/components/taiwan-map");
-
-    void promise.then((mod) => {
-      if (!cancelled) {
-        setTaiwanMap(() => mod.TaiwanMap);
-      }
-    });
+    // The bundler caches dynamic imports, so this resolves instantly if the
+    // module-level preload already completed. No module-level promise ref
+    // needed -- avoids Strict-Mode / HMR race conditions and adds retry on
+    // transient chunk-load failures.
+    import("@/components/taiwan-map").then(
+      (mod) => {
+        if (!cancelled) setTaiwanMap(() => mod.TaiwanMap);
+      },
+      () => {
+        // Retry once on transient chunk-load failure
+        if (!cancelled) {
+          void import("@/components/taiwan-map").then((mod) => {
+            if (!cancelled) setTaiwanMap(() => mod.TaiwanMap);
+          });
+        }
+      },
+    );
 
     return () => {
       cancelled = true;
