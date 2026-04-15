@@ -25,7 +25,7 @@ export function AddressForm({
 }: AddressFormProps) {
   return (
     <div className="space-y-6">
-      <div className="space-between space-y-4">
+      <div className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
           <CitySelect cities={cities} value={state.city} onChange={setCity} />
           <DistrictSelect
