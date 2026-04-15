@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-unnecessary-condition, @typescript-eslint/non-nullable-type-assertion-style, @typescript-eslint/no-confusing-void-expression, @typescript-eslint/prefer-nullish-coalescing, @typescript-eslint/no-floating-promises, @typescript-eslint/restrict-template-expressions, @typescript-eslint/prefer-optional-chain, @typescript-eslint/no-misused-promises */
 "use client";
 
 import MapLibreGL, { type PopupOptions, type MarkerOptions } from "maplibre-gl";
@@ -86,7 +85,6 @@ function useResolvedTheme(themeProp?: "light" | "dark"): Theme {
 type MapContextValue = {
   map: MapLibreGL.Map | null;
   isLoaded: boolean;
-  resolvedTheme: Theme;
 };
 
 const MapContext = createContext<MapContextValue | null>(null);
@@ -319,9 +317,8 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     () => ({
       map: mapInstance,
       isLoaded: isLoaded && isStyleLoaded,
-      resolvedTheme,
     }),
-    [mapInstance, isLoaded, isStyleLoaded, resolvedTheme],
+    [mapInstance, isLoaded, isStyleLoaded],
   );
 
   return (
