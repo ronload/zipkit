@@ -1,8 +1,30 @@
 "use client";
 
-import { useLayoutEffect, type ReactNode } from "react";
-import { Map as BaseMap, useMap } from "@/components/ui/map";
+import { createContext, useContext, useLayoutEffect, type ReactNode } from "react";
+import { useTheme } from "next-themes";
+import { Map as BaseMap, useMap as useBaseMap } from "@/components/ui/map";
 import { proxyCartoUrl, neutralizeMapColors } from "@/lib/map-proxy";
+
+type Theme = "light" | "dark";
+
+type CustomMapContextValue = {
+  resolvedTheme: Theme;
+};
+
+const CustomMapContext = createContext<CustomMapContextValue>({
+  resolvedTheme: "light",
+});
+
+/**
+ * Custom useMap that extends the stock mapcn useMap with resolvedTheme.
+ * Upstream mapcn removed resolvedTheme from its context; this wrapper
+ * re-provides it via next-themes so consuming components keep working.
+ */
+function useMap() {
+  const base = useBaseMap();
+  const { resolvedTheme } = useContext(CustomMapContext);
+  return { ...base, resolvedTheme };
+}
 
 const proxyStyles = {
   dark: "/map-cdn/basemaps/gl/dark-matter-gl-style/style.json",
@@ -32,32 +54,37 @@ type MapProps = React.ComponentProps<typeof BaseMap>;
  * Wraps the stock mapcn Map with:
  * - Proxied Carto CDN URLs to bypass CORS
  * - Automatic basemap color neutralization
+ * - resolvedTheme re-added to useMap context (removed by upstream)
  */
 function Map({
   children,
   styles,
   ...props
 }: MapProps & { children?: ReactNode }) {
+  const { resolvedTheme: nextTheme } = useTheme();
+  const resolvedTheme: Theme = nextTheme === "dark" ? "dark" : "light";
+
   const mergedStyles = {
     dark: styles?.dark ?? proxyStyles.dark,
     light: styles?.light ?? proxyStyles.light,
   };
 
   return (
-    <BaseMap
-      {...props}
-      styles={mergedStyles}
-      transformRequest={(url: string) => ({ url: proxyCartoUrl(url) })}
-    >
-      <NeutralizeColors />
-      {children}
-    </BaseMap>
+    <CustomMapContext.Provider value={{ resolvedTheme }}>
+      <BaseMap
+        {...props}
+        styles={mergedStyles}
+        transformRequest={(url: string) => ({ url: proxyCartoUrl(url) })}
+      >
+        <NeutralizeColors />
+        {children}
+      </BaseMap>
+    </CustomMapContext.Provider>
   );
 }
 
-export { Map };
+export { Map, useMap };
 export {
-  useMap,
   MapMarker,
   MarkerContent,
   MarkerPopup,
