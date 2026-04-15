@@ -119,7 +119,7 @@ export default function RootLayout({
                   href="https://github.com/donma/TaiwanAddressCityAreaRoadChineseEnglishJSON"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline underline-offset-2 hover:text-foreground"
+                  className="hover:text-foreground underline underline-offset-2"
                 >
                   {"TaiwanAddressCityAreaRoadChineseEnglishJSON"}
                 </a>
@@ -128,7 +128,7 @@ export default function RootLayout({
                   href="https://www.post.gov.tw/post/internet/Download/index.jsp?ID=2292"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline underline-offset-2 hover:text-foreground"
+                  className="hover:text-foreground underline underline-offset-2"
                 >
                   {"中華郵政 3+3 郵遞區號"}
                 </a>
