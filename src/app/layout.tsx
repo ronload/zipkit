@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -125,7 +126,10 @@ export default function RootLayout({
               </div>
             </div>
           </header>
-          <main className="flex-1">{children}</main>
+          <main className="flex-1">
+            {children}
+            {<Analytics />}
+          </main>
           <footer className="border-border/50 text-muted-foreground/70 border-t text-xs">
             <div className="mx-auto w-full max-w-3xl px-4 py-3 sm:px-6 lg:max-w-6xl">
               <p>{"地址英譯僅供參考。"}</p>
