@@ -12,14 +12,14 @@ interface AddressDetailInputsProps {
 const fields: {
   key: keyof AddressDetail;
   label: string;
-  placeholder: string;
+  placeholder?: string;
   required?: boolean;
 }[] = [
-  { key: "lane", label: "巷", placeholder: "16" },
-  { key: "alley", label: "弄", placeholder: "5" },
+  { key: "lane", label: "巷" },
+  { key: "alley", label: "弄" },
   { key: "number", label: "號", placeholder: "33 或 5之1", required: true },
-  { key: "floor", label: "樓", placeholder: "5" },
-  { key: "room", label: "室", placeholder: "2" },
+  { key: "floor", label: "樓" },
+  { key: "room", label: "室" },
 ];
 
 export function AddressDetailInputs({
