@@ -13,7 +13,10 @@ function SelectTrigger({
 }: React.ComponentProps<typeof BaseSelectTrigger>) {
   return (
     <BaseSelectTrigger
-      className={cn("disabled:bg-input/50 dark:disabled:bg-input/80", className)}
+      className={cn(
+        "disabled:bg-input/50 dark:disabled:bg-input/80",
+        className,
+      )}
       {...props}
     />
   );
