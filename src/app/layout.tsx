@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "zipkit | 台灣地址英譯 & 郵遞區號查詢",
     description:
       "輸入台灣中文地址，一鍵取得標準英文地址與 3+3 郵遞區號。免驗證碼、純前端運算、零延遲。",
