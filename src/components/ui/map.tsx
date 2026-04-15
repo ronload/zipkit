@@ -31,7 +31,10 @@ const cartoTilesRe = /^https:\/\/tiles(?:-[a-d])?\.basemaps\.cartocdn\.com\//;
 function proxyCartoUrl(url: string): string {
   const origin = window.location.origin;
   if (url.startsWith("https://basemaps.cartocdn.com/")) {
-    return url.replace("https://basemaps.cartocdn.com/", `${origin}/map-cdn/basemaps/`);
+    return url.replace(
+      "https://basemaps.cartocdn.com/",
+      `${origin}/map-cdn/basemaps/`,
+    );
   }
   const m = cartoTilesRe.exec(url);
   if (m) {
