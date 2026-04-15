@@ -1,4 +1,4 @@
-import { AddressForm } from "@/components/address-form";
+import { AddressPage } from "@/components/address-page";
 import baseData from "../../public/data/base.json";
 
 const jsonLd = {
@@ -24,9 +24,7 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
-        <AddressForm cities={baseData.cities} />
-      </div>
+      <AddressPage cities={baseData.cities} />
     </>
   );
 }
