@@ -86,6 +86,7 @@ function useResolvedTheme(themeProp?: "light" | "dark"): Theme {
 type MapContextValue = {
   map: MapLibreGL.Map | null;
   isLoaded: boolean;
+  resolvedTheme: Theme;
 };
 
 const MapContext = createContext<MapContextValue | null>(null);
@@ -318,8 +319,9 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     () => ({
       map: mapInstance,
       isLoaded: isLoaded && isStyleLoaded,
+      resolvedTheme,
     }),
-    [mapInstance, isLoaded, isStyleLoaded],
+    [mapInstance, isLoaded, isStyleLoaded, resolvedTheme],
   );
 
   return (

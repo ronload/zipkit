@@ -40,25 +40,74 @@ const TOWNS_SOURCE = "towns";
 const TOWNS_LINE = "towns-line";
 const TOWN_HIGHLIGHT = "town-highlight";
 
+type Theme = "light" | "dark";
+
+const themeColors = {
+  dark: {
+    countyLine: "rgba(255, 255, 255, 0.15)",
+    countyFill: "rgba(255, 255, 255, 0.08)",
+    countyOutline: "rgba(255, 255, 255, 0.4)",
+    townLine: "rgba(255, 255, 255, 0.20)",
+    townFill: "rgba(255, 255, 255, 0.15)",
+    townOutline: "rgba(255, 255, 255, 0.5)",
+  },
+  light: {
+    countyLine: "rgba(0, 0, 0, 0.15)",
+    countyFill: "rgba(0, 0, 0, 0.06)",
+    countyOutline: "rgba(0, 0, 0, 0.3)",
+    townLine: "rgba(0, 0, 0, 0.20)",
+    townFill: "rgba(0, 0, 0, 0.10)",
+    townOutline: "rgba(0, 0, 0, 0.4)",
+  },
+};
+
+function applyLayerColors(map: maplibregl.Map, theme: Theme) {
+  const colors = themeColors[theme];
+  if (map.getLayer(COUNTIES_LINE)) {
+    map.setPaintProperty(COUNTIES_LINE, "line-color", colors.countyLine);
+  }
+  if (map.getLayer(COUNTY_HIGHLIGHT)) {
+    map.setPaintProperty(COUNTY_HIGHLIGHT, "fill-color", colors.countyFill);
+    map.setPaintProperty(
+      COUNTY_HIGHLIGHT,
+      "fill-outline-color",
+      colors.countyOutline,
+    );
+  }
+  if (map.getLayer(TOWNS_LINE)) {
+    map.setPaintProperty(TOWNS_LINE, "line-color", colors.townLine);
+  }
+  if (map.getLayer(TOWN_HIGHLIGHT)) {
+    map.setPaintProperty(TOWN_HIGHLIGHT, "fill-color", colors.townFill);
+    map.setPaintProperty(
+      TOWN_HIGHLIGHT,
+      "fill-outline-color",
+      colors.townOutline,
+    );
+  }
+}
+
 function ensureCountyLayers(
   map: maplibregl.Map,
   data: FeatureCollection,
+  theme: Theme,
 ) {
+  const colors = themeColors[theme];
   if (map.getSource(COUNTIES_SOURCE)) return;
   map.addSource(COUNTIES_SOURCE, { type: "geojson", data });
   map.addLayer({
     id: COUNTIES_LINE,
     type: "line",
     source: COUNTIES_SOURCE,
-    paint: { "line-color": "rgba(255, 255, 255, 0.15)", "line-width": 0.8 },
+    paint: { "line-color": colors.countyLine, "line-width": 0.8 },
   });
   map.addLayer({
     id: COUNTY_HIGHLIGHT,
     type: "fill",
     source: COUNTIES_SOURCE,
     paint: {
-      "fill-color": "rgba(255, 255, 255, 0.08)",
-      "fill-outline-color": "rgba(255, 255, 255, 0.4)",
+      "fill-color": colors.countyFill,
+      "fill-outline-color": colors.countyOutline,
     },
     filter: ["==", ["get", "COUNTYNAME"], ""],
   });
@@ -67,7 +116,9 @@ function ensureCountyLayers(
 function ensureTownLayers(
   map: maplibregl.Map,
   data: FeatureCollection,
+  theme: Theme,
 ) {
+  const colors = themeColors[theme];
   const existingSource = map.getSource(TOWNS_SOURCE);
   if (existingSource) {
     (existingSource as GeoJSONSource).setData(data);
@@ -78,7 +129,7 @@ function ensureTownLayers(
       type: "line",
       source: TOWNS_SOURCE,
       paint: {
-        "line-color": "rgba(255, 255, 255, 0.20)",
+        "line-color": colors.townLine,
         "line-width": 0.5,
       },
     });
@@ -87,8 +138,8 @@ function ensureTownLayers(
       type: "fill",
       source: TOWNS_SOURCE,
       paint: {
-        "fill-color": "rgba(255, 255, 255, 0.15)",
-        "fill-outline-color": "rgba(255, 255, 255, 0.5)",
+        "fill-color": colors.townFill,
+        "fill-outline-color": colors.townOutline,
       },
       filter: ["==", ["get", "TOWNNAME"], ""],
     });
@@ -102,7 +153,7 @@ function MapLayers({
   city: City | null;
   district: District | null;
 }) {
-  const { map, isLoaded } = useMap();
+  const { map, isLoaded, resolvedTheme } = useMap();
   const [countiesData, setCountiesData] = useState<FeatureCollection | null>(
     null,
   );
@@ -126,7 +177,8 @@ function MapLayers({
     if (!map || !isLoaded || !countiesData) return;
 
     const applyCountyState = () => {
-      ensureCountyLayers(map, countiesData);
+      ensureCountyLayers(map, countiesData, resolvedTheme);
+      applyLayerColors(map, resolvedTheme);
 
       if (city) {
         const normalizedName = normalizeCityName(city.name);
@@ -162,7 +214,7 @@ function MapLayers({
     return () => {
       map.off("style.load", applyCountyState);
     };
-  }, [map, isLoaded, countiesData, city]);
+  }, [map, isLoaded, countiesData, city, resolvedTheme]);
 
   // Load towns when city changes
   useEffect(() => {
@@ -179,10 +231,7 @@ function MapLayers({
     void (async () => {
       townsTopologyRef.current ??= await loadTownsTopology();
       if (cancelRef.current) return;
-      const data = getTownsForCounty(
-        townsTopologyRef.current,
-        normalizedName,
-      );
+      const data = getTownsForCounty(townsTopologyRef.current, normalizedName);
       townsLoadedForRef.current = normalizedName;
       setTownsData(data);
     })();
@@ -197,7 +246,8 @@ function MapLayers({
     if (!map || !isLoaded || !townsData) return;
 
     const applyTownState = () => {
-      ensureTownLayers(map, townsData);
+      ensureTownLayers(map, townsData, resolvedTheme);
+      applyLayerColors(map, resolvedTheme);
       if (map.getLayer(TOWNS_LINE)) {
         map.setLayoutProperty(TOWNS_LINE, "visibility", "visible");
       }
@@ -228,7 +278,7 @@ function MapLayers({
     return () => {
       map.off("style.load", applyTownState);
     };
-  }, [map, isLoaded, townsData, city, district]);
+  }, [map, isLoaded, townsData, city, district, resolvedTheme]);
 
   return null;
 }
