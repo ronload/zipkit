@@ -26,26 +26,17 @@ export function formatEnglishAddress(
 ): string {
   const parts: string[] = [];
 
-  if (detail.room.trim()) {
-    parts.push(`Rm. ${detail.room.trim()}`);
-  }
+  const room = detail.room.trim();
+  const floor = detail.floor.trim();
+  const number = detail.number.trim();
+  const alley = detail.alley.trim();
+  const lane = detail.lane.trim();
 
-  if (detail.floor.trim()) {
-    parts.push(`${detail.floor.trim()}F.`);
-  }
-
-  if (detail.number.trim()) {
-    const num = detail.number.trim().replace(/之/g, "-");
-    parts.push(`No. ${num}`);
-  }
-
-  if (detail.alley.trim()) {
-    parts.push(`Aly. ${detail.alley.trim()}`);
-  }
-
-  if (detail.lane.trim()) {
-    parts.push(`Ln. ${detail.lane.trim()}`);
-  }
+  if (room) parts.push(`Rm. ${room}`);
+  if (floor) parts.push(`${floor}F.`);
+  if (number) parts.push(`No. ${number.replace(/之/g, "-")}`);
+  if (alley) parts.push(`Aly. ${alley}`);
+  if (lane) parts.push(`Ln. ${lane}`);
 
   parts.push(road.en);
   parts.push(district.en);
