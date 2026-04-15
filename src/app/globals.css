@@ -179,6 +179,26 @@ body::after {
   );
 }
 
+/* Stock shadcn slot overrides ─────────────────────────────────────────
+   These rules live outside @layer so they beat Tailwind utility classes.
+   They compensate for stock component defaults that don't match the
+   project's design without modifying the vendored shadcn/ui files. */
+
+/* Prevent double opacity: InputGroup applies has-disabled:opacity-50 on
+   the group; without this the nested input stacks its own opacity-50. */
+[data-slot="input-group-control"]:disabled {
+  opacity: 1;
+}
+
+/* Stock Input uses md:text-sm; override to text-base so combobox inputs
+   match every other form control in the project. */
+@media (width >= 48rem) {
+  [data-slot="input-group-control"] {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+}
+
 /* Refined transitions */
 @layer base {
   button,
