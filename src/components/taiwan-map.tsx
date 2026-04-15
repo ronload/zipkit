@@ -33,13 +33,67 @@ const TAIWAN_CENTER: [number, number] = [121.0, 23.5];
 const TAIWAN_ZOOM = 7;
 const FIT_PADDING = 60;
 
-// Layer and source IDs
 const COUNTIES_SOURCE = "counties";
 const COUNTIES_LINE = "counties-line";
 const COUNTY_HIGHLIGHT = "county-highlight";
 const TOWNS_SOURCE = "towns";
 const TOWNS_LINE = "towns-line";
 const TOWN_HIGHLIGHT = "town-highlight";
+
+function ensureCountyLayers(
+  map: maplibregl.Map,
+  data: FeatureCollection,
+) {
+  if (map.getSource(COUNTIES_SOURCE)) return;
+  map.addSource(COUNTIES_SOURCE, { type: "geojson", data });
+  map.addLayer({
+    id: COUNTIES_LINE,
+    type: "line",
+    source: COUNTIES_SOURCE,
+    paint: { "line-color": "rgba(255, 255, 255, 0.15)", "line-width": 0.8 },
+  });
+  map.addLayer({
+    id: COUNTY_HIGHLIGHT,
+    type: "fill",
+    source: COUNTIES_SOURCE,
+    paint: {
+      "fill-color": "rgba(255, 255, 255, 0.08)",
+      "fill-outline-color": "rgba(255, 255, 255, 0.4)",
+    },
+    filter: ["==", ["get", "COUNTYNAME"], ""],
+  });
+}
+
+function ensureTownLayers(
+  map: maplibregl.Map,
+  data: FeatureCollection,
+) {
+  const existingSource = map.getSource(TOWNS_SOURCE);
+  if (existingSource) {
+    (existingSource as GeoJSONSource).setData(data);
+  } else {
+    map.addSource(TOWNS_SOURCE, { type: "geojson", data });
+    map.addLayer({
+      id: TOWNS_LINE,
+      type: "line",
+      source: TOWNS_SOURCE,
+      paint: {
+        "line-color": "rgba(255, 255, 255, 0.20)",
+        "line-width": 0.5,
+      },
+    });
+    map.addLayer({
+      id: TOWN_HIGHLIGHT,
+      type: "fill",
+      source: TOWNS_SOURCE,
+      paint: {
+        "fill-color": "rgba(255, 255, 255, 0.15)",
+        "fill-outline-color": "rgba(255, 255, 255, 0.5)",
+      },
+      filter: ["==", ["get", "TOWNNAME"], ""],
+    });
+  }
+}
 
 function MapLayers({
   city,
@@ -49,187 +103,132 @@ function MapLayers({
   district: District | null;
 }) {
   const { map, isLoaded } = useMap();
-  const countiesRef = useRef<FeatureCollection | null>(null);
+  const [countiesData, setCountiesData] = useState<FeatureCollection | null>(
+    null,
+  );
+  const [townsData, setTownsData] = useState<FeatureCollection | null>(null);
   const townsTopologyRef = useRef<Topology | null>(null);
-  const layersInitializedRef = useRef(false);
+  const townsLoadedForRef = useRef<string | null>(null);
 
-  // Initialize county layers on map load
+  // Load counties data (one-time)
   useEffect(() => {
-    if (!map || !isLoaded) return;
-
-    let cancelled = false;
-
-    void loadCountiesGeoJSON().then((geojson) => {
-      if (cancelled) return;
-      countiesRef.current = geojson;
-
-      if (map.getSource(COUNTIES_SOURCE)) return;
-
-      map.addSource(COUNTIES_SOURCE, {
-        type: "geojson",
-        data: geojson,
-      });
-
-      map.addLayer({
-        id: COUNTIES_LINE,
-        type: "line",
-        source: COUNTIES_SOURCE,
-        paint: {
-          "line-color": "rgba(255, 255, 255, 0.15)",
-          "line-width": 0.8,
-        },
-      });
-
-      map.addLayer({
-        id: COUNTY_HIGHLIGHT,
-        type: "fill",
-        source: COUNTIES_SOURCE,
-        paint: {
-          "fill-color": "rgba(255, 255, 255, 0.08)",
-          "fill-outline-color": "rgba(255, 255, 255, 0.4)",
-        },
-        filter: ["==", ["get", "COUNTYNAME"], ""],
-      });
-
-      layersInitializedRef.current = true;
+    const cancelRef = { current: false };
+    void loadCountiesGeoJSON().then((data) => {
+      if (!cancelRef.current) setCountiesData(data);
     });
+    return () => {
+      cancelRef.current = true;
+    };
+  }, []);
+
+  // Manage county layers + highlight (re-runs on data load, city change, or style reload)
+  useEffect(() => {
+    if (!map || !isLoaded || !countiesData) return;
+
+    const applyCountyState = () => {
+      ensureCountyLayers(map, countiesData);
+
+      if (city) {
+        const normalizedName = normalizeCityName(city.name);
+        map.setFilter(COUNTY_HIGHLIGHT, [
+          "==",
+          ["get", "COUNTYNAME"],
+          normalizedName,
+        ]);
+        const countyFeatures = countiesData.features.filter(
+          (f) => f.properties?.COUNTYNAME === normalizedName,
+        );
+        if (countyFeatures.length > 0) {
+          map.fitBounds(computeBounds(countyFeatures), {
+            padding: FIT_PADDING,
+            duration: 800,
+          });
+        }
+      } else {
+        map.setFilter(COUNTY_HIGHLIGHT, ["==", ["get", "COUNTYNAME"], ""]);
+        if (map.getLayer(TOWN_HIGHLIGHT)) {
+          map.setFilter(TOWN_HIGHLIGHT, ["==", ["get", "TOWNNAME"], ""]);
+        }
+        if (map.getLayer(TOWNS_LINE)) {
+          map.setLayoutProperty(TOWNS_LINE, "visibility", "none");
+        }
+        map.flyTo({ center: TAIWAN_CENTER, zoom: TAIWAN_ZOOM, duration: 800 });
+      }
+    };
+
+    applyCountyState();
+    map.on("style.load", applyCountyState);
 
     return () => {
-      cancelled = true;
+      map.off("style.load", applyCountyState);
     };
-  }, [map, isLoaded]);
+  }, [map, isLoaded, countiesData, city]);
 
-  // Handle city selection: highlight county + load towns
+  // Load towns when city changes
   useEffect(() => {
-    if (!map || !isLoaded || !layersInitializedRef.current) return;
-
     if (!city) {
-      // Reset to full Taiwan view
-      map.setFilter(COUNTY_HIGHLIGHT, ["==", ["get", "COUNTYNAME"], ""]);
-      if (map.getLayer(TOWN_HIGHLIGHT)) {
-        map.setFilter(TOWN_HIGHLIGHT, ["==", ["get", "TOWNNAME"], ""]);
-      }
-      if (map.getLayer(TOWNS_LINE)) {
-        map.setLayoutProperty(TOWNS_LINE, "visibility", "none");
-      }
-      map.flyTo({ center: TAIWAN_CENTER, zoom: TAIWAN_ZOOM, duration: 800 });
+      setTownsData(null);
+      townsLoadedForRef.current = null;
       return;
     }
 
     const normalizedName = normalizeCityName(city.name);
+    if (townsLoadedForRef.current === normalizedName) return;
 
-    // Highlight county
-    map.setFilter(COUNTY_HIGHLIGHT, [
-      "==",
-      ["get", "COUNTYNAME"],
-      normalizedName,
-    ]);
-
-    // Fit bounds to selected county
-    if (countiesRef.current) {
-      const countyFeatures = countiesRef.current.features.filter(
-        (f) => f.properties?.COUNTYNAME === normalizedName,
-      );
-      if (countyFeatures.length > 0) {
-        map.fitBounds(computeBounds(countyFeatures), {
-          padding: FIT_PADDING,
-          duration: 800,
-        });
-      }
-    }
-
-    // Load towns for this county
     const cancelRef = { current: false };
-
     void (async () => {
       townsTopologyRef.current ??= await loadTownsTopology();
-
       if (cancelRef.current) return;
-
-      const townsGeoJSON = getTownsForCounty(
+      const data = getTownsForCounty(
         townsTopologyRef.current,
         normalizedName,
       );
-
-      const existingSource = map.getSource(TOWNS_SOURCE);
-      if (existingSource) {
-        (existingSource as GeoJSONSource).setData(townsGeoJSON);
-      } else {
-        map.addSource(TOWNS_SOURCE, {
-          type: "geojson",
-          data: townsGeoJSON,
-        });
-
-        map.addLayer({
-          id: TOWNS_LINE,
-          type: "line",
-          source: TOWNS_SOURCE,
-          paint: {
-            "line-color": "rgba(255, 255, 255, 0.20)",
-            "line-width": 0.5,
-          },
-        });
-
-        map.addLayer({
-          id: TOWN_HIGHLIGHT,
-          type: "fill",
-          source: TOWNS_SOURCE,
-          paint: {
-            "fill-color": "rgba(255, 255, 255, 0.15)",
-            "fill-outline-color": "rgba(255, 255, 255, 0.5)",
-          },
-          filter: ["==", ["get", "TOWNNAME"], ""],
-        });
-      }
-
-      if (map.getLayer(TOWNS_LINE)) {
-        map.setLayoutProperty(TOWNS_LINE, "visibility", "visible");
-      }
+      townsLoadedForRef.current = normalizedName;
+      setTownsData(data);
     })();
 
     return () => {
       cancelRef.current = true;
     };
-  }, [map, isLoaded, city]);
+  }, [city]);
 
-  // Handle district selection: highlight town + fit bounds
+  // Manage town layers + highlight
   useEffect(() => {
-    if (!map || !isLoaded || !city) return;
+    if (!map || !isLoaded || !townsData) return;
 
-    if (!district) {
-      if (map.getLayer(TOWN_HIGHLIGHT)) {
+    const applyTownState = () => {
+      ensureTownLayers(map, townsData);
+      if (map.getLayer(TOWNS_LINE)) {
+        map.setLayoutProperty(TOWNS_LINE, "visibility", "visible");
+      }
+      if (district && city) {
+        const normalizedCityName = normalizeCityName(city.name);
+        map.setFilter(TOWN_HIGHLIGHT, [
+          "all",
+          ["==", ["get", "TOWNNAME"], district.name],
+          ["==", ["get", "COUNTYNAME"], normalizedCityName],
+        ]);
+        const districtFeatures = townsData.features.filter(
+          (f) => f.properties?.TOWNNAME === district.name,
+        );
+        if (districtFeatures.length > 0) {
+          map.fitBounds(computeBounds(districtFeatures), {
+            padding: FIT_PADDING,
+            duration: 800,
+          });
+        }
+      } else if (map.getLayer(TOWN_HIGHLIGHT)) {
         map.setFilter(TOWN_HIGHLIGHT, ["==", ["get", "TOWNNAME"], ""]);
       }
-      return;
-    }
+    };
 
-    const normalizedCityName = normalizeCityName(city.name);
+    applyTownState();
+    map.on("style.load", applyTownState);
 
-    if (map.getLayer(TOWN_HIGHLIGHT)) {
-      map.setFilter(TOWN_HIGHLIGHT, [
-        "all",
-        ["==", ["get", "TOWNNAME"], district.name],
-        ["==", ["get", "COUNTYNAME"], normalizedCityName],
-      ]);
-    }
-
-    // Fit bounds to district
-    if (townsTopologyRef.current) {
-      const townsGeoJSON = getTownsForCounty(
-        townsTopologyRef.current,
-        normalizedCityName,
-      );
-      const districtFeatures = townsGeoJSON.features.filter(
-        (f) => f.properties?.TOWNNAME === district.name,
-      );
-      if (districtFeatures.length > 0) {
-        map.fitBounds(computeBounds(districtFeatures), {
-          padding: FIT_PADDING,
-          duration: 800,
-        });
-      }
-    }
-  }, [map, isLoaded, city, district]);
+    return () => {
+      map.off("style.load", applyTownState);
+    };
+  }, [map, isLoaded, townsData, city, district]);
 
   return null;
 }
