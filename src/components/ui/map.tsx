@@ -29,12 +29,16 @@ const defaultStyles = {
 const cartoTilesRe = /^https:\/\/tiles(?:-[a-d])?\.basemaps\.cartocdn\.com\//;
 
 function proxyCartoUrl(url: string): string {
+  const origin = window.location.origin;
   if (url.startsWith("https://basemaps.cartocdn.com/")) {
-    return url.replace("https://basemaps.cartocdn.com/", "/map-cdn/basemaps/");
+    return url.replace(
+      "https://basemaps.cartocdn.com/",
+      `${origin}/map-cdn/basemaps/`,
+    );
   }
   const m = cartoTilesRe.exec(url);
   if (m) {
-    return url.replace(m[0], "/map-cdn/tiles/");
+    return url.replace(m[0], `${origin}/map-cdn/tiles/`);
   }
   return url;
 }
