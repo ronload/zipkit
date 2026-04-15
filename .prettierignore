@@ -4,3 +4,4 @@ build
 node_modules
 pnpm-lock.yaml
 public/data
+src/components/ui
