@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useEffect, useMemo, useCallback } from "react";
+import { useReducer, useEffect, useMemo } from "react";
 import type {
   City,
   District,
@@ -112,13 +112,22 @@ export function useAddressState() {
     dispatch({ type: "SET_ROADS_LOADING", payload: true });
     dispatch({ type: "SET_ZIP_RANGES_LOADING", payload: true });
 
-    void loadRoads(zip3).then((roads) => {
-      if (!cancelled) dispatch({ type: "SET_ROADS", payload: roads });
-    });
+    void loadRoads(zip3)
+      .then((roads) => {
+        if (!cancelled) dispatch({ type: "SET_ROADS", payload: roads });
+      })
+      .catch(() => {
+        if (!cancelled) dispatch({ type: "SET_ROADS_LOADING", payload: false });
+      });
 
-    void loadZipRanges(zip3).then((ranges) => {
-      if (!cancelled) dispatch({ type: "SET_ZIP_RANGES", payload: ranges });
-    });
+    void loadZipRanges(zip3)
+      .then((ranges) => {
+        if (!cancelled) dispatch({ type: "SET_ZIP_RANGES", payload: ranges });
+      })
+      .catch(() => {
+        if (!cancelled)
+          dispatch({ type: "SET_ZIP_RANGES_LOADING", payload: false });
+      });
 
     return () => {
       cancelled = true;
@@ -155,21 +164,21 @@ export function useAddressState() {
     );
   }, [state.road, state.zipRanges, state.detail]);
 
-  const setCity = useCallback((city: City | null) => {
+  const setCity = (city: City | null) => {
     dispatch({ type: "SET_CITY", payload: city });
-  }, []);
-  const setDistrict = useCallback((district: District | null) => {
+  };
+  const setDistrict = (district: District | null) => {
     dispatch({ type: "SET_DISTRICT", payload: district });
-  }, []);
-  const setRoad = useCallback((road: Road | null) => {
+  };
+  const setRoad = (road: Road | null) => {
     dispatch({ type: "SET_ROAD", payload: road });
-  }, []);
-  const setDetail = useCallback((field: keyof AddressDetail, value: string) => {
+  };
+  const setDetail = (field: keyof AddressDetail, value: string) => {
     dispatch({ type: "SET_DETAIL", field, value });
-  }, []);
-  const reset = useCallback(() => {
+  };
+  const reset = () => {
     dispatch({ type: "RESET" });
-  }, []);
+  };
 
   return {
     state,
