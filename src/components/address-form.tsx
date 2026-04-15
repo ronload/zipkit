@@ -19,7 +19,6 @@ export function AddressForm({
   setDistrict,
   setRoad,
   setDetail,
-  reset,
   englishAddress,
   zip3,
   zip6,
@@ -38,21 +37,21 @@ export function AddressForm({
           />
         </div>
 
-        <RoadCombobox
-          key={state.district?.zip3 ?? "empty"}
-          roads={state.roads}
-          value={state.road}
-          onChange={setRoad}
-          disabled={!state.district}
-          loading={state.roadsLoading}
-        />
-
-        <AddressDetailInputs
-          values={state.detail}
-          onChange={setDetail}
-          disabled={!state.road}
-          onReset={reset}
-        />
+        <div className="grid grid-cols-2 gap-3">
+          <RoadCombobox
+            key={state.district?.zip3 ?? "empty"}
+            roads={state.roads}
+            value={state.road}
+            onChange={setRoad}
+            disabled={!state.district}
+            loading={state.roadsLoading}
+          />
+          <AddressDetailInputs
+            values={state.detail}
+            onChange={setDetail}
+            disabled={!state.road}
+          />
+        </div>
       </div>
 
       <div>
