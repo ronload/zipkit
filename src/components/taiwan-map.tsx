@@ -5,28 +5,17 @@ import type { FeatureCollection } from "geojson";
 import type { Topology } from "topojson-specification";
 import type { GeoJSONSource } from "maplibre-gl";
 import type { City, District } from "@/lib/types";
-import {
-  Map,
-  useMap,
-  MapMarker,
-  MarkerContent,
-  MapControls,
-} from "@/components/ui/map";
+import { Map, useMap, MapControls } from "@/components/ui/map";
 import {
   loadCountiesGeoJSON,
   loadTownsTopology,
   getTownsForCounty,
 } from "@/lib/map-data-loader";
-import {
-  computeCentroid,
-  computeBounds,
-  normalizeCityName,
-} from "@/lib/map-utils";
+import { computeBounds, normalizeCityName } from "@/lib/map-utils";
 
 interface TaiwanMapProps {
   city: City | null;
   district: District | null;
-  zip6: string | null;
 }
 
 const TAIWAN_CENTER: [number, number] = [121.0, 23.5];
@@ -332,40 +321,7 @@ function MapLayers({
   return null;
 }
 
-function PulseMarker({ city, district }: { city: City; district: District }) {
-  const [center, setCenter] = useState<[number, number] | null>(null);
-
-  useEffect(() => {
-    const cancelRef = { current: false };
-    void (async () => {
-      const topology = await loadTownsTopology();
-      if (cancelRef.current) return;
-      const normalizedCityName = normalizeCityName(city.name);
-      const townsGeoJSON = getTownsForCounty(topology, normalizedCityName);
-      const feature = townsGeoJSON.features.find(
-        (f) => f.properties?.TOWNNAME === district.name,
-      );
-      if (feature) {
-        setCenter(computeCentroid(feature));
-      }
-    })();
-    return () => {
-      cancelRef.current = true;
-    };
-  }, [city, district]);
-
-  if (!center) return null;
-
-  return (
-    <MapMarker longitude={center[0]} latitude={center[1]}>
-      <MarkerContent>
-        <div className="map-pulse-dot" />
-      </MarkerContent>
-    </MapMarker>
-  );
-}
-
-export function TaiwanMap({ city, district, zip6 }: TaiwanMapProps) {
+export function TaiwanMap({ city, district }: TaiwanMapProps) {
   return (
     <div className="border-border/50 h-full w-full overflow-hidden rounded-xl border">
       <Map
@@ -375,9 +331,6 @@ export function TaiwanMap({ city, district, zip6 }: TaiwanMapProps) {
         attributionControl={false}
       >
         <MapLayers city={city} district={district} />
-        {city && district && zip6 && (
-          <PulseMarker city={city} district={district} />
-        )}
         <MapControls />
       </Map>
     </div>

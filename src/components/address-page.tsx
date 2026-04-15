@@ -53,7 +53,6 @@ const MAX_RETRIES = 2;
 interface TaiwanMapProps {
   city: City | null;
   district: District | null;
-  zip6: string | null;
 }
 
 type MapLoadState =
@@ -135,14 +134,12 @@ const LazyMap = memo(function LazyMap({
   Component,
   city,
   district,
-  zip6,
 }: {
   Component: ComponentType<TaiwanMapProps>;
   city: City | null;
   district: District | null;
-  zip6: string | null;
 }) {
-  return <Component city={city} district={district} zip6={zip6} />;
+  return <Component city={city} district={district} />;
 });
 
 /* ------------------------------------------------------------------ */
@@ -193,7 +190,6 @@ export function AddressPage({ cities }: AddressPageProps) {
               Component={mapState.Component}
               city={addressState.state.city}
               district={addressState.state.district}
-              zip6={addressState.zip6}
             />
           ) : mapState.status === "error" ? (
             <MapError onRetry={retry} />
