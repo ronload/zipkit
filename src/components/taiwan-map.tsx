@@ -5,7 +5,7 @@ import type { FeatureCollection } from "geojson";
 import type { Topology } from "topojson-specification";
 import type { GeoJSONSource } from "maplibre-gl";
 import type { City, District } from "@/lib/types";
-import { Map, useMap, MapControls } from "@/components/ui/map";
+import { Map, useMap, MapControls } from "@/components/custom/map";
 import {
   loadCountiesGeoJSON,
   loadTownsTopology,

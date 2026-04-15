@@ -1,7 +1,7 @@
 "use client";
 
 import type { AddressDetail } from "@/lib/types";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/custom/input";
 
 interface AddressDetailInputsProps {
   values: AddressDetail;
