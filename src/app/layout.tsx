@@ -111,8 +111,28 @@ export default function RootLayout({
           </header>
           <main className="flex-1">{children}</main>
           <footer className="border-border/50 text-muted-foreground/70 border-t text-xs">
-            <div className="mx-auto w-full max-w-3xl px-4 py-3 sm:px-6">
-              {"地址英譯僅供參考。資料來源：中華郵政。"}
+            <div className="mx-auto w-full max-w-3xl px-4 py-3 sm:px-6 lg:max-w-6xl">
+              <p>{"地址英譯僅供參考。"}</p>
+              <p className="mt-1">
+                {"資料來源："}
+                <a
+                  href="https://github.com/donma/TaiwanAddressCityAreaRoadChineseEnglishJSON"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 hover:text-foreground"
+                >
+                  {"TaiwanAddressCityAreaRoadChineseEnglishJSON"}
+                </a>
+                {"、"}
+                <a
+                  href="https://www.post.gov.tw/post/internet/Download/index.jsp?ID=2292"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 hover:text-foreground"
+                >
+                  {"中華郵政 3+3 郵遞區號"}
+                </a>
+              </p>
             </div>
           </footer>
           <Toaster
