@@ -298,7 +298,7 @@ function MapLayers({
 
 export function TaiwanMap({ city, district }: TaiwanMapProps) {
   return (
-    <div className="border-border/50 h-full w-full overflow-hidden rounded-xl border">
+    <div className="h-full w-full">
       <Map
         center={TAIWAN_CENTER}
         zoom={TAIWAN_ZOOM}

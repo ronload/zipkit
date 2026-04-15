@@ -76,7 +76,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <header className="border-border/50 sticky top-0 z-40 h-12 backdrop-blur-xl">
+          <header className="border-border/50 sticky top-0 z-40 h-12 backdrop-blur-xl lg:hidden lg:border-b">
             <div className="mx-auto flex h-full w-full max-w-3xl items-center justify-between px-4 sm:px-6 lg:max-w-6xl">
               <div className="flex items-center gap-2">
                 <span className="text-lg font-semibold tracking-tight">

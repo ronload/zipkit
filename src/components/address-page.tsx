@@ -10,6 +10,8 @@ import {
 import type { City, District } from "@/lib/types";
 import { useAddressState } from "@/hooks/use-address-state";
 import { AddressForm } from "@/components/address-form";
+import { ModeToggle } from "@/components/mode-toggle";
+import { Card } from "@/components/ui/card";
 
 /* ------------------------------------------------------------------ */
 /*  Module-level preload                                               */
@@ -178,13 +180,46 @@ export function AddressPage({ cities }: AddressPageProps) {
   }, [load]);
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-12 lg:grid lg:max-w-6xl lg:grid-cols-[minmax(0,30rem)_1fr] lg:gap-8 lg:py-8">
-      <AddressForm cities={cities} {...addressState} />
+    <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-12 lg:grid lg:min-h-screen lg:max-w-6xl lg:grid-cols-[minmax(0,30rem)_1fr] lg:items-center lg:gap-8 lg:py-0">
+      <div>
+        <Card className="mb-6 hidden border-l lg:flex" size="sm">
+          <div className="flex items-center justify-between px-4">
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-semibold tracking-tight">
+                zipkit
+              </span>
+              <span className="text-muted-foreground text-base">/</span>
+              <span className="text-muted-foreground text-base">
+                {"地址英譯 & 郵遞區號"}
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <a
+                href="https://github.com/ronload/zipkit"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub"
+                className="text-muted-foreground hover:bg-secondary hover:text-foreground flex h-7 w-7 items-center justify-center rounded-md transition-colors"
+              >
+                <svg
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                  className="h-4 w-4"
+                >
+                  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z" />
+                </svg>
+              </a>
+              <ModeToggle />
+            </div>
+          </div>
+        </Card>
+        <AddressForm cities={cities} {...addressState} />
+      </div>
 
       {/* Always in the DOM — SSR grid is correct, zero layout shift.
           CSS `hidden lg:block` toggles visibility without JS. */}
       <div className="hidden lg:block">
-        <div className="sticky top-16 h-[calc(100vh-8rem)]">
+        <div className="sticky top-0 h-screen">
           {mapState.status === "ready" ? (
             <LazyMap
               Component={mapState.Component}
