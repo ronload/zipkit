@@ -26,15 +26,15 @@ const defaultStyles = {
   light: "/map-cdn/basemaps/gl/positron-gl-style/style.json",
 };
 
+const cartoTilesRe = /^https:\/\/tiles(?:-[a-d])?\.basemaps\.cartocdn\.com\//;
+
 function proxyCartoUrl(url: string): string {
   if (url.startsWith("https://basemaps.cartocdn.com/")) {
     return url.replace("https://basemaps.cartocdn.com/", "/map-cdn/basemaps/");
   }
-  if (url.startsWith("https://tiles.basemaps.cartocdn.com/")) {
-    return url.replace(
-      "https://tiles.basemaps.cartocdn.com/",
-      "/map-cdn/tiles/",
-    );
+  const m = cartoTilesRe.exec(url);
+  if (m) {
+    return url.replace(m[0], "/map-cdn/tiles/");
   }
   return url;
 }
