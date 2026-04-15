@@ -34,12 +34,20 @@ export function AddressPage({ cities }: AddressPageProps) {
     if (!isDesktop) return;
 
     if (typeof requestIdleCallback === "function") {
-      const id = requestIdleCallback(() => { setMapReady(true); });
-      return () => { cancelIdleCallback(id); };
+      const id = requestIdleCallback(() => {
+        setMapReady(true);
+      });
+      return () => {
+        cancelIdleCallback(id);
+      };
     }
 
-    const id = setTimeout(() => { setMapReady(true); }, 0);
-    return () => { clearTimeout(id); };
+    const id = setTimeout(() => {
+      setMapReady(true);
+    }, 0);
+    return () => {
+      clearTimeout(id);
+    };
   }, [isDesktop]);
 
   return (
