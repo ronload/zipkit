@@ -5,6 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --animate-shake: shake 0.3s ease-in-out;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -177,6 +178,21 @@ body::after {
     oklch(0.922 0 0 / 4%) 0%,
     transparent 70%
   );
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-4px);
+  }
+  40%,
+  80% {
+    transform: translateX(4px);
+  }
 }
 
 /* Stock shadcn slot overrides ─────────────────────────────────────────
