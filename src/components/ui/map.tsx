@@ -22,9 +22,22 @@ import { X, Minus, Plus, Locate, Maximize, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const defaultStyles = {
-  dark: "/map-styles/dark-matter-gl-style/style.json",
-  light: "/map-styles/positron-gl-style/style.json",
+  dark: "/map-cdn/basemaps/gl/dark-matter-gl-style/style.json",
+  light: "/map-cdn/basemaps/gl/positron-gl-style/style.json",
 };
+
+function proxyCartoUrl(url: string): string {
+  if (url.startsWith("https://basemaps.cartocdn.com/")) {
+    return url.replace("https://basemaps.cartocdn.com/", "/map-cdn/basemaps/");
+  }
+  if (url.startsWith("https://tiles.basemaps.cartocdn.com/")) {
+    return url.replace(
+      "https://tiles.basemaps.cartocdn.com/",
+      "/map-cdn/tiles/",
+    );
+  }
+  return url;
+}
 
 type Theme = "light" | "dark";
 
@@ -229,6 +242,7 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
       attributionControl: {
         compact: true,
       },
+      transformRequest: (url) => ({ url: proxyCartoUrl(url) }),
       ...props,
       ...viewport,
     });
