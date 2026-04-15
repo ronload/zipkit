@@ -1,21 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
+import { useEffect, useState, type ComponentType } from "react";
 import type { City } from "@/lib/types";
 import { useAddressState } from "@/hooks/use-address-state";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { AddressForm } from "@/components/address-form";
 
-const TaiwanMap = dynamic(
-  () => import("@/components/taiwan-map").then((m) => m.TaiwanMap),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="border-border/50 bg-muted/30 h-full w-full animate-pulse rounded-xl border" />
-    ),
-  },
-);
+// Module-level: start downloading the map chunk during hydration (before any
+// useEffect fires). Only on desktop to avoid wasting mobile bandwidth.
+// Also prime the HTTP cache for counties data in parallel.
+const isDesktopAtLoad =
+  typeof window !== "undefined" &&
+  window.matchMedia("(min-width: 1024px)").matches;
+
+const mapModulePromise = isDesktopAtLoad
+  ? import("@/components/taiwan-map")
+  : null;
+
+if (isDesktopAtLoad) {
+  void fetch("/data/map/counties-10t.json");
+}
 
 const MapPlaceholder = () => (
   <div className="border-border/50 bg-muted/30 h-full w-full animate-pulse rounded-xl border" />
@@ -28,25 +32,26 @@ interface AddressPageProps {
 export function AddressPage({ cities }: AddressPageProps) {
   const addressState = useAddressState();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
-  const [mapReady, setMapReady] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [TaiwanMap, setTaiwanMap] = useState<ComponentType<any> | null>(null);
 
   useEffect(() => {
     if (!isDesktop) return;
 
-    if (typeof requestIdleCallback === "function") {
-      const id = requestIdleCallback(() => {
-        setMapReady(true);
-      });
-      return () => {
-        cancelIdleCallback(id);
-      };
-    }
+    let cancelled = false;
 
-    const id = setTimeout(() => {
-      setMapReady(true);
-    }, 0);
+    // If the module-level preload started, reuse that promise;
+    // otherwise start a fresh download (e.g. viewport was resized to desktop).
+    const promise = mapModulePromise ?? import("@/components/taiwan-map");
+
+    void promise.then((mod) => {
+      if (!cancelled) {
+        setTaiwanMap(() => mod.TaiwanMap);
+      }
+    });
+
     return () => {
-      clearTimeout(id);
+      cancelled = true;
     };
   }, [isDesktop]);
 
@@ -56,7 +61,7 @@ export function AddressPage({ cities }: AddressPageProps) {
       {isDesktop && (
         <div>
           <div className="sticky top-16 h-[calc(100vh-8rem)]">
-            {mapReady ? (
+            {TaiwanMap ? (
               <TaiwanMap
                 city={addressState.state.city}
                 district={addressState.state.district}
