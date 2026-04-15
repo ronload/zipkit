@@ -8,8 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "check": "tsc --noEmit && eslint && prettier --check .",
     "etl": "tsx scripts/etl.ts"
   },
   "dependencies": {
