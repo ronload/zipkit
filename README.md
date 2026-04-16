@@ -50,15 +50,15 @@ pnpm dev
 
 ## 指令
 
-| 指令              | 說明                        |
-| ----------------- | --------------------------- |
-| `pnpm dev`        | 啟動開發伺服器              |
-| `pnpm build`      | 正式環境建置                |
-| `pnpm lint`       | 執行 ESLint 檢查            |
-| `pnpm typecheck`  | TypeScript 型別檢查         |
-| `pnpm format`     | 格式化程式碼 (Prettier)     |
-| `pnpm check`      | 一次執行 typecheck + lint + format check |
-| `pnpm etl`        | 從原始資料重新產生靜態 JSON |
+| 指令             | 說明                                     |
+| ---------------- | ---------------------------------------- |
+| `pnpm dev`       | 啟動開發伺服器                           |
+| `pnpm build`     | 正式環境建置                             |
+| `pnpm lint`      | 執行 ESLint 檢查                         |
+| `pnpm typecheck` | TypeScript 型別檢查                      |
+| `pnpm format`    | 格式化程式碼 (Prettier)                  |
+| `pnpm check`     | 一次執行 typecheck + lint + format check |
+| `pnpm etl`       | 從原始資料重新產生靜態 JSON              |
 
 ## 架構
 
