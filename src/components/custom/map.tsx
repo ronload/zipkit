@@ -1,14 +1,9 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useLayoutEffect,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import { useTheme } from "next-themes";
 import { Map as BaseMap, useMap as useBaseMap } from "@/components/ui/map";
-import { proxyCartoUrl, neutralizeMapColors } from "@/lib/map-proxy";
+import { proxyCartoUrl } from "@/lib/map-proxy";
 
 type Theme = "light" | "dark";
 
@@ -32,33 +27,16 @@ function useMap() {
 }
 
 const proxyStyles = {
-  dark: "/map-cdn/basemaps/gl/dark-matter-gl-style/style.json",
-  light: "/map-cdn/basemaps/gl/positron-gl-style/style.json",
+  dark: "/data/styles/dark-matter-neutral.json",
+  light: "/data/styles/positron-neutral.json",
 };
-
-/**
- * Applies color neutralization to Carto basemap layers after each style load.
- * Strips saturation and pins background/water colors to the project palette.
- * Uses useLayoutEffect to run before the browser paints, avoiding color flash.
- */
-function NeutralizeColors() {
-  const { map, isLoaded, resolvedTheme } = useMap();
-
-  useLayoutEffect(() => {
-    if (!map || !isLoaded) return;
-    neutralizeMapColors(map, resolvedTheme);
-  }, [map, isLoaded, resolvedTheme]);
-
-  return null;
-}
 
 type MapProps = React.ComponentProps<typeof BaseMap>;
 
 /**
  * Project-customized Map.
  * Wraps the stock mapcn Map with:
- * - Proxied Carto CDN URLs to bypass CORS
- * - Automatic basemap color neutralization
+ * - Pre-processed neutral basemap styles (no runtime color flash)
  * - resolvedTheme re-added to useMap context (removed by upstream)
  */
 function Map({
@@ -81,7 +59,6 @@ function Map({
         styles={mergedStyles}
         transformRequest={(url: string) => ({ url: proxyCartoUrl(url) })}
       >
-        <NeutralizeColors />
         {children}
       </BaseMap>
     </CustomMapContext.Provider>
