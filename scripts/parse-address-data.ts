@@ -42,6 +42,7 @@ export function parseAddressData(rawDir: string, outDir: string) {
 
   // Generate base.json
   const base = {
+    generatedAt: new Date().toISOString(),
     cities: cityData
       .filter((c) => !SKIP_CITIES.has(c.CityName))
       .map((c) => ({
