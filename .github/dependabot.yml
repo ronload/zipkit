@@ -5,6 +5,12 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # eslint-plugin-react (transitive via eslint-config-next) is not yet
+      # compatible with ESLint 10. Revisit once upstream ships a fix.
+      - dependency-name: eslint
+        update-types:
+          - version-update:semver-major
     groups:
       dev-dependencies:
         dependency-type: development
