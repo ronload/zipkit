@@ -9,6 +9,7 @@ import {
 } from "react";
 import type { City, District } from "@/lib/types";
 import { useAddressState } from "@/hooks/use-address-state";
+import { toSlug } from "@/lib/slug";
 import { AddressForm } from "@/components/address-form";
 import { LogoIcon, GitHubIcon } from "@/components/icons";
 import { ModeToggle } from "@/components/mode-toggle";
@@ -156,6 +157,24 @@ interface AddressPageProps {
 export function AddressPage({ cities }: AddressPageProps) {
   const addressState = useAddressState();
   const { state: mapState, load, retry } = useLazyMap();
+
+  // Hydrate city/district from ?city=&district= query string (once on mount).
+  // Landing pages CTA back to home with these params.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const citySlug = url.searchParams.get("city");
+    const districtSlug = url.searchParams.get("district");
+    if (!citySlug || !districtSlug) return;
+
+    const city = cities.find((c) => toSlug(c.en) === citySlug);
+    if (!city) return;
+    const district = city.districts.find((d) => toSlug(d.en) === districtSlug);
+    if (!district) return;
+
+    addressState.setCity(city);
+    addressState.setDistrict(district);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Trigger map load when viewport hits desktop width.
   // Listens for resize so tablet rotation / window expansion still works.
