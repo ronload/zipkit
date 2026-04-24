@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import type { City } from "@/lib/types";
 import type { useAddressState } from "@/hooks/use-address-state";
 import { CitySelect } from "@/components/city-select";
@@ -7,6 +9,7 @@ import { DistrictSelect } from "@/components/district-select";
 import { RoadCombobox } from "@/components/road-combobox";
 import { AddressDetailInputs } from "@/components/address-detail-inputs";
 import { ResultCard } from "@/components/result-card";
+import { toSlug } from "@/lib/slug";
 
 type AddressFormProps = {
   cities: City[];
@@ -61,6 +64,17 @@ export function AddressForm({
           </span>
         </div>
         <ResultCard englishAddress={englishAddress} zip6={zip6} zip3={zip3} />
+        {state.city && state.district && (
+          <div className="mt-3">
+            <Link
+              href={`/tw/${toSlug(state.city.en)}/${toSlug(state.district.en)}`}
+              className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs transition-colors"
+            >
+              查看{state.district.name}全區道路英譯與 3+3 區段
+              <ArrowUpRight className="h-3 w-3" />
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
