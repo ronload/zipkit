@@ -4,11 +4,13 @@ export default function robots(): MetadataRoute.Robots {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
   return {
-    rules: {
-      userAgent: "*",
-      allow: "/",
-      disallow: "/data/",
-    },
+    rules: [
+      { userAgent: "*", allow: "/", disallow: "/data/" },
+      { userAgent: "GPTBot", allow: "/", disallow: "/data/" },
+      { userAgent: "Google-Extended", allow: "/", disallow: "/data/" },
+      { userAgent: "PerplexityBot", allow: "/", disallow: "/data/" },
+      { userAgent: "ClaudeBot", allow: "/", disallow: "/data/" },
+    ],
     sitemap: `${siteUrl}/sitemap.xml`,
   };
 }
