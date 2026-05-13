@@ -159,6 +159,14 @@ function MapLayers({
   const townsTopologyRef = useRef<Topology | null>(null);
   const townsLoadedForRef = useRef<string | null>(null);
 
+  const [prevCity, setPrevCity] = useState(city);
+  if (prevCity !== city) {
+    setPrevCity(city);
+    if (!city) {
+      setTownsData(null);
+    }
+  }
+
   // Set map labels to local language (Chinese for Taiwan)
   useEffect(() => {
     if (!map || !isLoaded) return;
@@ -232,7 +240,6 @@ function MapLayers({
   // Load towns when city changes
   useEffect(() => {
     if (!city) {
-      setTownsData(null);
       townsLoadedForRef.current = null;
       return;
     }
