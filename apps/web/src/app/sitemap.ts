@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { toSlug } from "@/lib/slug";
-import type { City } from "@/lib/types";
+import type { City } from "@zipkit/core";
 import baseData from "../../public/data/base.json";
 
 export default function sitemap(): MetadataRoute.Sitemap {

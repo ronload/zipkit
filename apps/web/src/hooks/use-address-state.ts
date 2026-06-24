@@ -7,13 +7,10 @@ import type {
   Road,
   AddressDetail,
   ZipRange,
-} from "@/lib/types";
+} from "@zipkit/core";
 import { loadRoads, loadZipRanges } from "@/lib/data-loader";
-import {
-  formatEnglishAddress,
-  parseNumber,
-} from "@/lib/format-english-address";
-import { lookupZip6 } from "@/lib/lookup-zipcode";
+import { formatEnglishAddress, parseNumber } from "@zipkit/core";
+import { lookupZip6 } from "@zipkit/core";
 
 const EMPTY_DETAIL: AddressDetail = {
   lane: "",

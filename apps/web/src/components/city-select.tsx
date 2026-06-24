@@ -1,6 +1,6 @@
 "use client";
 
-import type { City } from "@/lib/types";
+import type { City } from "@zipkit/core";
 import {
   Select,
   SelectContent,

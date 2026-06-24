@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { toSlug } from "@/lib/slug";
-import type { City, District, Road, ZipRange } from "@/lib/types";
+import type { City, District, Road, ZipRange } from "@zipkit/core";
 import baseData from "../../../../../public/data/base.json";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
