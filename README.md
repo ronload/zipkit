@@ -35,6 +35,7 @@
 - [MapLibre GL JS](https://maplibre.org/) -- 台灣行政區地圖
 - [TypeScript](https://www.typescriptlang.org/) 6
 - [pnpm](https://pnpm.io/) workspace monorepo（`apps/web` 應用 + `packages/core` 核心邏輯）
+- [tsdown](https://tsdown.dev/) -- `@zipkit/core` 套件建置（Rolldown 驅動，輸出 ESM + 型別宣告）
 
 ## 快速開始
 
@@ -108,7 +109,11 @@ packages/
       lookup-zipcode.ts         # 3+3 郵遞區號特異性評分比對
       format-english-address.ts # UPU 格式英譯
       types.ts                  # 共用領域型別
+    tsdown.config.ts            # tsdown 建置設定（輸出 ESM + .d.ts 至 dist/）
+    dist/                       # 建置產物（不納入版本控制）
 ```
+
+`@zipkit/core` 以 [tsdown](https://tsdown.dev/) 建置為 `dist/`（ESM + 型別宣告），`apps/web` 消費編譯後的套件而非 TS 原始碼。凡會觸及 web 的指令（`dev`、`build`、`lint`、`typecheck`）皆會先建置 `@zipkit/core`，確保 `dist/` 就緒。
 
 ## 資料來源
 

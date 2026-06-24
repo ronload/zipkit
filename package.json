@@ -4,16 +4,16 @@
   "private": true,
   "packageManager": "pnpm@10.33.0",
   "scripts": {
-    "dev": "pnpm --filter web dev",
+    "dev": "pnpm --filter @zipkit/core build && pnpm --filter web dev",
     "build": "pnpm --filter web build",
     "start": "pnpm --filter web start",
-    "lint": "pnpm --filter web lint",
-    "typecheck": "pnpm --recursive typecheck",
+    "lint": "pnpm --filter @zipkit/core build && pnpm --filter web lint",
+    "typecheck": "pnpm --filter @zipkit/core build && pnpm --recursive typecheck",
     "etl": "pnpm --filter web etl",
     "test": "pnpm --recursive run test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "pnpm --recursive typecheck && pnpm --filter web lint && prettier --check ."
+    "check": "pnpm --filter @zipkit/core build && pnpm --recursive typecheck && pnpm --filter web lint && prettier --check ."
   },
   "devDependencies": {
     "prettier": "^3.8.4",
