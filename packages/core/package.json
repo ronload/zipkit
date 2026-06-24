@@ -1,8 +1,31 @@
 {
   "name": "@zipkit/core",
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "Framework-agnostic core for Taiwan address English (UPU) translation and 3+3 postal code lookup.",
+  "keywords": [
+    "taiwan",
+    "postal-code",
+    "zipcode",
+    "zip-code",
+    "address",
+    "upu",
+    "3+3",
+    "english-translation"
+  ],
+  "license": "MIT",
+  "author": "ronload",
+  "homepage": "https://github.com/ronload/zipkit/tree/main/packages/core#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ronload/zipkit.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/ronload/zipkit/issues"
+  },
   "private": true,
   "type": "module",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -15,6 +38,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
