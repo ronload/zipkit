@@ -5,7 +5,7 @@
   "packageManager": "pnpm@10.33.0",
   "scripts": {
     "dev": "pnpm --filter @zipkit/core build && pnpm --filter web dev",
-    "build": "pnpm --filter @zipkit/core build && pnpm --filter web build",
+    "build": "pnpm --filter web build",
     "start": "pnpm --filter web start",
     "lint": "pnpm --filter @zipkit/core build && pnpm --filter web lint",
     "typecheck": "pnpm --filter @zipkit/core build && pnpm --recursive typecheck",
