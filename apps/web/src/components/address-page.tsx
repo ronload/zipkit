@@ -7,7 +7,7 @@ import {
   memo,
   type ComponentType,
 } from "react";
-import type { City, District } from "@/lib/types";
+import type { City, District } from "@zipkit/core";
 import { useAddressState } from "@/hooks/use-address-state";
 import { toSlug } from "@/lib/slug";
 import { AddressForm } from "@/components/address-form";

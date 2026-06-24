@@ -1,6 +1,6 @@
 "use client";
 
-import type { AddressDetail } from "@/lib/types";
+import type { AddressDetail } from "@zipkit/core";
 import { Input } from "@/components/custom/input";
 
 interface AddressDetailInputsProps {

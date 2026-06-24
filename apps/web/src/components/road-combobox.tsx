@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import type { Road } from "@/lib/types";
+import type { Road } from "@zipkit/core";
 import {
   Combobox,
   ComboboxContent,

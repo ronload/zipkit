@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { FeatureCollection } from "geojson";
 import type { Topology } from "topojson-specification";
 import type { GeoJSONSource } from "maplibre-gl";
-import type { City, District } from "@/lib/types";
+import type { City, District } from "@zipkit/core";
 import { Map, useMap, MapControls } from "@/components/custom/map";
 import {
   loadCountiesGeoJSON,

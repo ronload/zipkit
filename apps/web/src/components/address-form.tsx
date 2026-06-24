@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import type { City } from "@/lib/types";
+import type { City } from "@zipkit/core";
 import type { useAddressState } from "@/hooks/use-address-state";
 import { CitySelect } from "@/components/city-select";
 import { DistrictSelect } from "@/components/district-select";

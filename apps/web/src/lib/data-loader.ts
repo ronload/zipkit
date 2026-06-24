@@ -1,4 +1,4 @@
-import type { Road, ZipRange } from "./types";
+import type { Road, ZipRange } from "@zipkit/core";
 
 const roadsCache = new Map<string, Road[]>();
 const zipRangesCache = new Map<string, ZipRange[]>();
