@@ -56,6 +56,7 @@ pnpm dev
 | `pnpm build`     | 正式環境建置                             |
 | `pnpm lint`      | 執行 ESLint 檢查                         |
 | `pnpm typecheck` | TypeScript 型別檢查                      |
+| `pnpm test`      | 執行 `@zipkit/core` 單元測試 (Vitest)    |
 | `pnpm format`    | 格式化程式碼 (Prettier)                  |
 | `pnpm check`     | 一次執行 typecheck + lint + format check |
 | `pnpm etl`       | 從原始資料重新產生靜態 JSON              |

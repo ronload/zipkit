@@ -10,6 +10,7 @@
     "lint": "pnpm --filter web lint",
     "typecheck": "pnpm --recursive typecheck",
     "etl": "pnpm --filter web etl",
+    "test": "pnpm --recursive run test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "pnpm --recursive typecheck && pnpm --filter web lint && prettier --check ."
