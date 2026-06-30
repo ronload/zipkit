@@ -16,7 +16,7 @@
     "check": "pnpm --filter @zipkit/core build && pnpm --recursive typecheck && pnpm --filter web lint && prettier --check ."
   },
   "devDependencies": {
-    "prettier": "^3.8.4",
+    "prettier": "^3.9.4",
     "prettier-plugin-tailwindcss": "^0.8.0"
   }
 }
