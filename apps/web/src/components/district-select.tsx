@@ -2,6 +2,7 @@
 
 import { useId } from "react";
 import type { District } from "@zipkit/core";
+import { FieldLabel } from "@/components/custom/field-label";
 import {
   Select,
   SelectContent,
@@ -26,12 +27,7 @@ export function DistrictSelect({
   const id = useId();
   return (
     <div className="space-y-1.5">
-      <label
-        htmlFor={id}
-        className="text-muted-foreground text-[11px] font-medium"
-      >
-        {"鄉鎮市區"}
-      </label>
+      <FieldLabel htmlFor={id}>{"鄉鎮市區"}</FieldLabel>
       <Select
         value={value?.name ?? null}
         onValueChange={(name) => {

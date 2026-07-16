@@ -2,6 +2,7 @@
 
 import { useCallback, useId, useRef, useState } from "react";
 import type { Road } from "@zipkit/core";
+import { FieldLabel } from "@/components/custom/field-label";
 import {
   Combobox,
   ComboboxContent,
@@ -50,12 +51,7 @@ export function RoadCombobox({
 
   return (
     <div className="space-y-1.5">
-      <label
-        htmlFor={id}
-        className="text-muted-foreground text-[11px] font-medium"
-      >
-        {"路/街"}
-      </label>
+      <FieldLabel htmlFor={loading ? undefined : id}>{"路/街"}</FieldLabel>
       {loading ? (
         <div className="border-input dark:bg-input/30 flex h-8 w-full items-center gap-2 rounded-lg border bg-transparent px-2.5">
           <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />

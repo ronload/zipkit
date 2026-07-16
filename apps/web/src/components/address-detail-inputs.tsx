@@ -2,6 +2,7 @@
 
 import { useId } from "react";
 import type { AddressDetail } from "@zipkit/core";
+import { FieldLabel } from "@/components/custom/field-label";
 import { Input } from "@/components/custom/input";
 
 interface AddressDetailInputsProps {
@@ -31,27 +32,27 @@ export function AddressDetailInputs({
   const id = useId();
   return (
     <>
-      {fields.map((f) => (
-        <div key={f.key} className="space-y-1.5">
-          <label
-            htmlFor={`${id}-${f.key}`}
-            className="text-muted-foreground text-[11px] font-medium"
-          >
-            {f.label}
-            {f.required && <span className="text-destructive ml-0.5">*</span>}
-          </label>
-          <Input
-            id={`${id}-${f.key}`}
-            placeholder={f.placeholder}
-            value={values[f.key]}
-            onChange={(e) => {
-              onChange(f.key, e.target.value);
-            }}
-            disabled={disabled}
-            className="text-base"
-          />
-        </div>
-      ))}
+      {fields.map((f) => {
+        const fieldId = `${id}-${f.key}`;
+        return (
+          <div key={f.key} className="space-y-1.5">
+            <FieldLabel htmlFor={fieldId} required={f.required}>
+              {f.label}
+            </FieldLabel>
+            <Input
+              id={fieldId}
+              placeholder={f.placeholder}
+              value={values[f.key]}
+              onChange={(e) => {
+                onChange(f.key, e.target.value);
+              }}
+              disabled={disabled}
+              required={f.required}
+              className="text-base"
+            />
+          </div>
+        );
+      })}
     </>
   );
 }
