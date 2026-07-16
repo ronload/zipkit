@@ -11,6 +11,13 @@ updates:
       - dependency-name: eslint
         update-types:
           - version-update:semver-major
+      # typescript 7 is the native compiler and ships a different npm package
+      # layout (no lib/typescript.js). typescript-eslint peer-requires <6.1.0
+      # and next resolves the TS integration through lib/typescript.js, so both
+      # eslint and next build crash. Drop this once both support TS 7.
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
     groups:
       dev-dependencies:
         dependency-type: development
