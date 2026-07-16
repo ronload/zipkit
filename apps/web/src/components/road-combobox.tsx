@@ -40,6 +40,16 @@ export function RoadCombobox({
   const [shaking, setShaking] = useState(false);
   const inputValueRef = useRef("");
 
+  // Screen readers only announce text changes inside an already-mounted live
+  // region, so keep one mounted permanently instead of toggling role=status
+  // on the transient loading placeholder. An empty roads list means no
+  // district is selected yet, so the region starts silent.
+  const statusText = loading
+    ? "路/街選項載入中"
+    : roads.length > 0
+      ? "路/街選項載入完成"
+      : "";
+
   const triggerShake = useCallback(() => {
     setShaking(false);
     requestAnimationFrame(() => {
@@ -52,11 +62,11 @@ export function RoadCombobox({
   return (
     <div className="space-y-1.5">
       <FieldLabel htmlFor={loading ? undefined : id}>{"路/街"}</FieldLabel>
+      <span role="status" className="sr-only">
+        {statusText}
+      </span>
       {loading ? (
-        <div
-          role="status"
-          className="border-input dark:bg-input/30 flex h-8 w-full items-center gap-2 rounded-lg border bg-transparent px-2.5"
-        >
+        <div className="border-input dark:bg-input/30 flex h-8 w-full items-center gap-2 rounded-lg border bg-transparent px-2.5">
           <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
           <span className="text-muted-foreground text-base">{"載入中..."}</span>
         </div>

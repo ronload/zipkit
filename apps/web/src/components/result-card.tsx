@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Copy, Check } from "lucide-react";
 
@@ -21,16 +21,23 @@ function CopyButton({
 }) {
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const copyRunRef = useRef(0);
 
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
+  const clearResetTimer = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
   }, []);
 
+  useEffect(() => {
+    return clearResetTimer;
+  }, [clearResetTimer]);
+
   const handleCopy = () => {
+    // Overlapping writeText calls can settle out of order; only the outcome
+    // of the most recent click may touch the UI.
+    const run = ++copyRunRef.current;
     const handleFailure = () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
+      if (run !== copyRunRef.current) return;
+      clearResetTimer();
       setCopied(false);
       toast.error("複製失敗，請手動選取文字");
     };
@@ -38,9 +45,10 @@ function CopyButton({
     // partially implemented, so writeText can throw synchronously on click.
     try {
       void navigator.clipboard.writeText(text).then(() => {
+        if (run !== copyRunRef.current) return;
         setCopied(true);
         toast.success(copiedMessage);
-        if (timerRef.current) clearTimeout(timerRef.current);
+        clearResetTimer();
         timerRef.current = setTimeout(() => {
           setCopied(false);
         }, 1500);
