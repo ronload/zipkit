@@ -1,12 +1,15 @@
+import next from "@next/eslint-plugin-next";
 import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
-import tseslint from "typescript-eslint";
 import prettierConfig from "eslint-config-prettier";
+import reactHooks from "eslint-plugin-react-hooks";
+import tseslint from "typescript-eslint";
 
+// Composed from the plugins directly rather than eslint-config-next, which
+// still pulls in eslint-plugin-react. That plugin calls context.getFilename(),
+// removed in eslint 10, and crashes on load. See vercel/next.js#89764.
 const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
+  next.configs["core-web-vitals"],
+  reactHooks.configs.flat["recommended-latest"],
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
   {
