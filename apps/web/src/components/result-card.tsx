@@ -23,7 +23,7 @@ function CopyButton({ text, label }: { text: string; label: string }) {
   const handleCopy = () => {
     void navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
-      toast.success(label);
+      toast.success(`已${label}`);
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => {
         setCopied(false);
@@ -33,6 +33,8 @@ function CopyButton({ text, label }: { text: string; label: string }) {
 
   return (
     <button
+      type="button"
+      aria-label={label}
       onClick={handleCopy}
       className="text-muted-foreground hover:bg-secondary hover:text-foreground flex h-6 w-6 items-center justify-center rounded-md transition-colors"
     >
@@ -54,7 +56,7 @@ export function ResultCard({ englishAddress, zip6, zip3 }: ResultCardProps) {
             {"英文地址"}
           </span>
           {englishAddress && (
-            <CopyButton text={englishAddress} label={"已複製英文地址"} />
+            <CopyButton text={englishAddress} label={"複製英文地址"} />
           )}
         </div>
         <p className="min-h-[4.875rem] text-base leading-relaxed font-medium tracking-wide">
@@ -68,7 +70,7 @@ export function ResultCard({ englishAddress, zip6, zip3 }: ResultCardProps) {
             <span className="text-muted-foreground text-[11px] font-medium tracking-widest uppercase">
               {"3+3 郵遞區號"}
             </span>
-            {zip6 && <CopyButton text={zip6} label={"已複製 3+3 郵遞區號"} />}
+            {zip6 && <CopyButton text={zip6} label={"複製 3+3 郵遞區號"} />}
           </div>
           <p className="font-mono text-xl font-semibold tracking-wider tabular-nums">
             {zip6 ? (
@@ -86,7 +88,7 @@ export function ResultCard({ englishAddress, zip6, zip3 }: ResultCardProps) {
             <span className="text-muted-foreground text-[11px] font-medium tracking-widest uppercase">
               {"3 碼"}
             </span>
-            {zip3 && <CopyButton text={zip3} label={"已複製郵遞區號"} />}
+            {zip3 && <CopyButton text={zip3} label={"複製郵遞區號"} />}
           </div>
           <p className="font-mono text-xl font-semibold tracking-wider tabular-nums">
             {zip3 ?? <span className="invisible">000</span>}

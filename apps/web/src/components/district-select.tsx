@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import type { District } from "@zipkit/core";
 import {
   Select,
@@ -22,9 +23,13 @@ export function DistrictSelect({
   onChange,
   disabled,
 }: DistrictSelectProps) {
+  const id = useId();
   return (
     <div className="space-y-1.5">
-      <label className="text-muted-foreground text-[11px] font-medium">
+      <label
+        htmlFor={id}
+        className="text-muted-foreground text-[11px] font-medium"
+      >
         {"鄉鎮市區"}
       </label>
       <Select
@@ -35,7 +40,7 @@ export function DistrictSelect({
         }}
         disabled={disabled}
       >
-        <SelectTrigger className="w-full text-base">
+        <SelectTrigger id={id} className="w-full text-base">
           <SelectValue placeholder={"請選擇鄉鎮市區..."} />
         </SelectTrigger>
         <SelectContent align="start" alignItemWithTrigger={false}>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import type { AddressDetail } from "@zipkit/core";
 import { Input } from "@/components/custom/input";
 
@@ -27,15 +28,20 @@ export function AddressDetailInputs({
   onChange,
   disabled,
 }: AddressDetailInputsProps) {
+  const id = useId();
   return (
     <>
       {fields.map((f) => (
         <div key={f.key} className="space-y-1.5">
-          <label className="text-muted-foreground text-[11px] font-medium">
+          <label
+            htmlFor={`${id}-${f.key}`}
+            className="text-muted-foreground text-[11px] font-medium"
+          >
             {f.label}
             {f.required && <span className="text-destructive ml-0.5">*</span>}
           </label>
           <Input
+            id={`${id}-${f.key}`}
             placeholder={f.placeholder}
             value={values[f.key]}
             onChange={(e) => {

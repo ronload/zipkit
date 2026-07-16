@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import type { City } from "@zipkit/core";
 import {
   Select,
@@ -16,9 +17,13 @@ interface CitySelectProps {
 }
 
 export function CitySelect({ cities, value, onChange }: CitySelectProps) {
+  const id = useId();
   return (
     <div className="space-y-1.5">
-      <label className="text-muted-foreground text-[11px] font-medium">
+      <label
+        htmlFor={id}
+        className="text-muted-foreground text-[11px] font-medium"
+      >
         {"縣市"}
       </label>
       <Select
@@ -28,7 +33,7 @@ export function CitySelect({ cities, value, onChange }: CitySelectProps) {
           onChange(city);
         }}
       >
-        <SelectTrigger className="w-full text-base">
+        <SelectTrigger id={id} className="w-full text-base">
           <SelectValue placeholder={"請選擇縣市..."} />
         </SelectTrigger>
         <SelectContent align="start" alignItemWithTrigger={false}>
