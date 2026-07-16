@@ -53,7 +53,10 @@ export function RoadCombobox({
     <div className="space-y-1.5">
       <FieldLabel htmlFor={loading ? undefined : id}>{"路/街"}</FieldLabel>
       {loading ? (
-        <div className="border-input dark:bg-input/30 flex h-8 w-full items-center gap-2 rounded-lg border bg-transparent px-2.5">
+        <div
+          role="status"
+          className="border-input dark:bg-input/30 flex h-8 w-full items-center gap-2 rounded-lg border bg-transparent px-2.5"
+        >
           <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
           <span className="text-muted-foreground text-base">{"載入中..."}</span>
         </div>

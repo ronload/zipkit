@@ -29,23 +29,25 @@ function CopyButton({
   }, []);
 
   const handleCopy = () => {
-    if (!("clipboard" in navigator)) {
+    const handleFailure = () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      setCopied(false);
       toast.error("複製失敗，請手動選取文字");
-      return;
-    }
-    void navigator.clipboard.writeText(text).then(
-      () => {
+    };
+    // try/catch covers environments where navigator.clipboard is missing or
+    // partially implemented, so writeText can throw synchronously on click.
+    try {
+      void navigator.clipboard.writeText(text).then(() => {
         setCopied(true);
         toast.success(copiedMessage);
         if (timerRef.current) clearTimeout(timerRef.current);
         timerRef.current = setTimeout(() => {
           setCopied(false);
         }, 1500);
-      },
-      () => {
-        toast.error("複製失敗，請手動選取文字");
-      },
-    );
+      }, handleFailure);
+    } catch {
+      handleFailure();
+    }
   };
 
   return (
