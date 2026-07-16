@@ -27,6 +27,7 @@ interface State {
   detail: AddressDetail;
   roads: Road[];
   roadsLoading: boolean;
+  roadsError: boolean;
   zipRanges: ZipRange[];
   zipRangesLoading: boolean;
 }
@@ -38,6 +39,7 @@ type Action =
   | { type: "SET_DETAIL"; field: keyof AddressDetail; value: string }
   | { type: "SET_ROADS"; payload: Road[] }
   | { type: "SET_ROADS_LOADING"; payload: boolean }
+  | { type: "SET_ROADS_ERROR" }
   | { type: "SET_ZIP_RANGES"; payload: ZipRange[] }
   | { type: "SET_ZIP_RANGES_LOADING"; payload: boolean }
   | { type: "RESET" };
@@ -49,6 +51,7 @@ const initialState: State = {
   detail: EMPTY_DETAIL,
   roads: [],
   roadsLoading: false,
+  roadsError: false,
   zipRanges: [],
   zipRangesLoading: false,
 };
@@ -68,6 +71,7 @@ function reducer(state: State, action: Action): State {
         detail: EMPTY_DETAIL,
         roads: [],
         roadsLoading: false,
+        roadsError: false,
         zipRanges: [],
       };
     case "SET_ROAD":
@@ -82,9 +86,16 @@ function reducer(state: State, action: Action): State {
         detail: { ...state.detail, [action.field]: action.value },
       };
     case "SET_ROADS":
-      return { ...state, roads: action.payload, roadsLoading: false };
+      return {
+        ...state,
+        roads: action.payload,
+        roadsLoading: false,
+        roadsError: false,
+      };
     case "SET_ROADS_LOADING":
       return { ...state, roadsLoading: action.payload };
+    case "SET_ROADS_ERROR":
+      return { ...state, roads: [], roadsLoading: false, roadsError: true };
     case "SET_ZIP_RANGES":
       return { ...state, zipRanges: action.payload, zipRangesLoading: false };
     case "SET_ZIP_RANGES_LOADING":
@@ -114,7 +125,7 @@ export function useAddressState() {
         if (!cancelled) dispatch({ type: "SET_ROADS", payload: roads });
       })
       .catch(() => {
-        if (!cancelled) dispatch({ type: "SET_ROADS_LOADING", payload: false });
+        if (!cancelled) dispatch({ type: "SET_ROADS_ERROR" });
       });
 
     void loadZipRanges(zip3)

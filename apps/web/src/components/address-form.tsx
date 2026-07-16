@@ -26,6 +26,19 @@ export function AddressForm({
   zip3,
   zip6,
 }: AddressFormProps) {
+  // The road live region must live here: RoadCombobox is keyed by district,
+  // so any status element inside it would be remounted on district change and
+  // screen readers do not reliably announce text present at insertion time.
+  // Empty roads with no error means the district was just selected (or none
+  // is), so the region stays silent until loading actually starts.
+  const roadStatusText = state.roadsLoading
+    ? "路/街選項載入中"
+    : state.roadsError
+      ? "路/街選項載入失敗"
+      : state.district && state.roads.length > 0
+        ? "路/街選項載入完成"
+        : "";
+
   return (
     <div className="space-y-6">
       <div className="space-y-4">
@@ -40,6 +53,9 @@ export function AddressForm({
           />
         </div>
 
+        <span role="status" className="sr-only">
+          {roadStatusText}
+        </span>
         <div className="grid grid-cols-2 gap-3">
           <RoadCombobox
             key={state.district?.zip3 ?? "empty"}

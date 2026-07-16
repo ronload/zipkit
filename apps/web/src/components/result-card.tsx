@@ -10,6 +10,11 @@ interface ResultCardProps {
   zip3: string | null;
 }
 
+// All CopyButton instances write to the single shared clipboard, so the
+// click generation counter is module-level: only the most recent click
+// across every button may report its outcome.
+let latestCopyRun = 0;
+
 function CopyButton({
   text,
   label,
@@ -21,22 +26,27 @@ function CopyButton({
 }) {
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
-  const copyRunRef = useRef(0);
+  const mountedRef = useRef(true);
 
   const clearResetTimer = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
   }, []);
 
   useEffect(() => {
-    return clearResetTimer;
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      clearResetTimer();
+    };
   }, [clearResetTimer]);
 
   const handleCopy = () => {
     // Overlapping writeText calls can settle out of order; only the outcome
-    // of the most recent click may touch the UI.
-    const run = ++copyRunRef.current;
+    // of the most recent click on a still-mounted button may touch the UI.
+    const run = ++latestCopyRun;
+    const isStale = () => run !== latestCopyRun || !mountedRef.current;
     const handleFailure = () => {
-      if (run !== copyRunRef.current) return;
+      if (isStale()) return;
       clearResetTimer();
       setCopied(false);
       toast.error("複製失敗，請手動選取文字");
@@ -45,7 +55,7 @@ function CopyButton({
     // partially implemented, so writeText can throw synchronously on click.
     try {
       void navigator.clipboard.writeText(text).then(() => {
-        if (run !== copyRunRef.current) return;
+        if (isStale()) return;
         setCopied(true);
         toast.success(copiedMessage);
         clearResetTimer();
