@@ -62,17 +62,39 @@ const initialState: State = {
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "SET_CITY":
+      // Base UI Select fires onValueChange even when the already-selected item
+      // is pressed. Re-selecting the current city (unique by name) must be a
+      // no-op; otherwise it would reset the whole form and silently discard the
+      // district, road, and detail the user already entered.
+      if (action.payload?.name === state.city?.name) return state;
       return {
         ...initialState,
         city: action.payload,
       };
     case "SET_DISTRICT": {
-      // Base UI Select fires onValueChange even when the already-selected
-      // item is pressed. Re-selecting the same district (unique by name within
-      // a city) must be a no-op: wiping the loaded roads/ranges without a
-      // district change would leave the load effect, keyed on the district
-      // object, dormant and the form dead-ended with no reload.
-      if (action.payload?.name === state.district?.name) return state;
+      // Base UI Select fires onValueChange even when the already-selected item
+      // is pressed, and districts are unique by name within a city, so a
+      // same-name press is a re-selection of the current district.
+      if (action.payload?.name === state.district?.name) {
+        // While a load succeeded or is still in flight, re-selecting is a no-op
+        // that preserves the user's road/detail entries. After a failure it is
+        // the only retry affordance (there is no visible error UI yet), so
+        // re-run the failed load(s): a fresh district reference re-triggers the
+        // load effect without disturbing any data that did load.
+        const failed =
+          state.roadsStatus === "error" || state.zipRangesStatus === "error";
+        if (!failed) return state;
+        return {
+          ...state,
+          district: state.district ? { ...state.district } : null,
+          roadsStatus:
+            state.roadsStatus === "error" ? "loading" : state.roadsStatus,
+          zipRangesStatus:
+            state.zipRangesStatus === "error"
+              ? "loading"
+              : state.zipRangesStatus,
+        };
+      }
       const loading: LoadStatus = action.payload ? "loading" : "idle";
       return {
         ...state,
