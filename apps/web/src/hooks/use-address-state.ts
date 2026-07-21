@@ -31,6 +31,10 @@ interface State {
   roadsStatus: LoadStatus;
   zipRanges: ZipRange[];
   zipRangesStatus: LoadStatus;
+  // Bumped to re-run the load effect for the current district without changing
+  // its identity, so a retry after a failed fetch does not disturb consumers
+  // (e.g. the map) that key on the district reference.
+  loadNonce: number;
 }
 
 // The async load actions carry the zip3 they were requested for. The reducer
@@ -57,6 +61,7 @@ const initialState: State = {
   roadsStatus: "idle",
   zipRanges: [],
   zipRangesStatus: "idle",
+  loadNonce: 0,
 };
 
 function reducer(state: State, action: Action): State {
@@ -79,14 +84,16 @@ function reducer(state: State, action: Action): State {
         // While a load succeeded or is still in flight, re-selecting is a no-op
         // that preserves the user's road/detail entries. After a failure it is
         // the only retry affordance (there is no visible error UI yet), so
-        // re-run the failed load(s): a fresh district reference re-triggers the
-        // load effect without disturbing any data that did load.
+        // re-run the failed load(s) by bumping loadNonce. The district
+        // reference is left untouched so consumers keyed on its identity (the
+        // map) do not react; only the load effect, which also depends on
+        // loadNonce, re-runs.
         const failed =
           state.roadsStatus === "error" || state.zipRangesStatus === "error";
         if (!failed) return state;
         return {
           ...state,
-          district: state.district ? { ...state.district } : null,
+          loadNonce: state.loadNonce + 1,
           roadsStatus:
             state.roadsStatus === "error" ? "loading" : state.roadsStatus,
           zipRangesStatus:
@@ -147,12 +154,13 @@ export function useAddressState() {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const district = state.district;
+  const loadNonce = state.loadNonce;
 
-  // Load roads and zip ranges when the selected district changes. SET_DISTRICT
-  // has already moved both statuses to "loading"; the settlement actions carry
-  // zip3 so the reducer can reject any that arrive for a district the user has
-  // left, and the local `cancelled` flag skips dispatching for a superseded
-  // effect in the common case.
+  // Load roads and zip ranges when the selected district changes, or when a
+  // retry bumps loadNonce. SET_DISTRICT has already moved both statuses to
+  // "loading"; the settlement actions carry zip3 so the reducer can reject any
+  // that arrive for a district the user has left, and the local `cancelled`
+  // flag skips dispatching for a superseded effect in the common case.
   useEffect(() => {
     if (!district) return;
 
@@ -179,7 +187,7 @@ export function useAddressState() {
     return () => {
       cancelled = true;
     };
-  }, [district]);
+  }, [district, loadNonce]);
 
   // Computed: English address
   const englishAddress = useMemo(() => {
