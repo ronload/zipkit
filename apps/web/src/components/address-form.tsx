@@ -27,11 +27,12 @@ export function AddressForm({
   zip6,
 }: AddressFormProps) {
   // The road live region must live here, not inside RoadCombobox: the combobox
-  // is remounted on every district change (keyed by district name) to reset its
-  // local error state, and screen readers do not reliably announce text present
-  // at a node's insertion time. The text is derived from the explicit
-  // roadsStatus machine, so an idle form stays silent and a district whose road
-  // list is legitimately empty still announces completion.
+  // is remounted on every fresh road load (keyed by district name plus the
+  // retry nonce) to reset its local invalid-input state, and screen readers do
+  // not reliably announce text present at a node's insertion time. The text is
+  // derived from the explicit roadsStatus machine, so an idle form stays silent
+  // and a district whose road list is legitimately empty still announces
+  // completion.
   const roadStatusText =
     state.roadsStatus === "loading"
       ? "路/街選項載入中"
@@ -60,7 +61,11 @@ export function AddressForm({
         </span>
         <div className="grid grid-cols-2 gap-3">
           <RoadCombobox
-            key={state.district?.name ?? "empty"}
+            key={
+              state.district
+                ? `${state.district.name}#${String(state.loadNonce)}`
+                : "empty"
+            }
             roads={state.roads}
             value={state.road}
             onChange={setRoad}
