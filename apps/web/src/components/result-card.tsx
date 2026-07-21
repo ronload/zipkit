@@ -15,15 +15,7 @@ interface ResultCardProps {
 // across every button may report its outcome.
 let latestCopyRun = 0;
 
-function CopyButton({
-  text,
-  label,
-  copiedMessage,
-}: {
-  text: string;
-  label: string;
-  copiedMessage: string;
-}) {
+function CopyButton({ text, label }: { text: string; label: string }) {
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
   const mountedRef = useRef(true);
@@ -57,7 +49,9 @@ function CopyButton({
       void navigator.clipboard.writeText(text).then(() => {
         if (isStale()) return;
         setCopied(true);
-        toast.success(copiedMessage);
+        // The success toast mirrors the button's own action label ("複製…"),
+        // so it is derived rather than passed as a separate, drift-prone prop.
+        toast.success(`已${label}`);
         clearResetTimer();
         timerRef.current = setTimeout(() => {
           setCopied(false);
@@ -93,11 +87,7 @@ export function ResultCard({ englishAddress, zip6, zip3 }: ResultCardProps) {
             {"英文地址"}
           </span>
           {englishAddress && (
-            <CopyButton
-              text={englishAddress}
-              label={"複製英文地址"}
-              copiedMessage={"已複製英文地址"}
-            />
+            <CopyButton text={englishAddress} label={"複製英文地址"} />
           )}
         </div>
         <p className="min-h-[4.875rem] text-base leading-relaxed font-medium tracking-wide">
@@ -111,13 +101,7 @@ export function ResultCard({ englishAddress, zip6, zip3 }: ResultCardProps) {
             <span className="text-muted-foreground text-[11px] font-medium tracking-widest uppercase">
               {"3+3 郵遞區號"}
             </span>
-            {zip6 && (
-              <CopyButton
-                text={zip6}
-                label={"複製 3+3 郵遞區號"}
-                copiedMessage={"已複製 3+3 郵遞區號"}
-              />
-            )}
+            {zip6 && <CopyButton text={zip6} label={"複製 3+3 郵遞區號"} />}
           </div>
           <p className="font-mono text-xl font-semibold tracking-wider tabular-nums">
             {zip6 ? (
@@ -135,13 +119,7 @@ export function ResultCard({ englishAddress, zip6, zip3 }: ResultCardProps) {
             <span className="text-muted-foreground text-[11px] font-medium tracking-widest uppercase">
               {"3 碼"}
             </span>
-            {zip3 && (
-              <CopyButton
-                text={zip3}
-                label={"複製郵遞區號"}
-                copiedMessage={"已複製郵遞區號"}
-              />
-            )}
+            {zip3 && <CopyButton text={zip3} label={"複製郵遞區號"} />}
           </div>
           <p className="font-mono text-xl font-semibold tracking-wider tabular-nums">
             {zip3 ?? <span className="invisible">000</span>}
