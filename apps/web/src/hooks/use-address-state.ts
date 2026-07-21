@@ -20,26 +20,39 @@ const EMPTY_DETAIL: AddressDetail = {
   room: "",
 };
 
+type LoadStatus = "idle" | "loading" | "loaded" | "error";
+
 interface State {
   city: City | null;
   district: District | null;
   road: Road | null;
   detail: AddressDetail;
   roads: Road[];
-  roadsLoading: boolean;
+  roadsStatus: LoadStatus;
   zipRanges: ZipRange[];
-  zipRangesLoading: boolean;
+  zipRangesStatus: LoadStatus;
+  // A per-resource load generation. Bumping one re-runs only that resource's
+  // load effect for the current district without changing the district
+  // identity, so a retry after a failed fetch neither disturbs consumers (the
+  // map) keyed on the district reference nor remounts the road combobox when
+  // only the zip ranges are being retried.
+  roadsLoadId: number;
+  zipRangesLoadId: number;
 }
 
+// The async load actions carry the zip3 they were requested for. The reducer
+// applies them only while that zip3 is still the selected district's, so a
+// fetch that settles after the user has navigated away is dropped regardless
+// of when React flushes the loading effect's cleanup.
 type Action =
   | { type: "SET_CITY"; payload: City | null }
   | { type: "SET_DISTRICT"; payload: District | null }
   | { type: "SET_ROAD"; payload: Road | null }
   | { type: "SET_DETAIL"; field: keyof AddressDetail; value: string }
-  | { type: "SET_ROADS"; payload: Road[] }
-  | { type: "SET_ROADS_LOADING"; payload: boolean }
-  | { type: "SET_ZIP_RANGES"; payload: ZipRange[] }
-  | { type: "SET_ZIP_RANGES_LOADING"; payload: boolean }
+  | { type: "SET_ROADS"; zip3: string; payload: Road[] }
+  | { type: "SET_ROADS_ERROR"; zip3: string }
+  | { type: "SET_ZIP_RANGES"; zip3: string; payload: ZipRange[] }
+  | { type: "SET_ZIP_RANGES_ERROR"; zip3: string }
   | { type: "RESET" };
 
 const initialState: State = {
@@ -48,28 +61,62 @@ const initialState: State = {
   road: null,
   detail: EMPTY_DETAIL,
   roads: [],
-  roadsLoading: false,
+  roadsStatus: "idle",
   zipRanges: [],
-  zipRangesLoading: false,
+  zipRangesStatus: "idle",
+  roadsLoadId: 0,
+  zipRangesLoadId: 0,
 };
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "SET_CITY":
+      // Base UI Select fires onValueChange even when the already-selected item
+      // is pressed. Re-selecting the current city (unique by name) must be a
+      // no-op; otherwise it would reset the whole form and silently discard the
+      // district, road, and detail the user already entered.
+      if (action.payload?.name === state.city?.name) return state;
       return {
         ...initialState,
         city: action.payload,
       };
-    case "SET_DISTRICT":
+    case "SET_DISTRICT": {
+      // Base UI Select fires onValueChange even when the already-selected item
+      // is pressed, and districts are unique by name within a city, so a
+      // same-name press is a re-selection of the current district.
+      if (action.payload?.name === state.district?.name) {
+        // While a load succeeded or is still in flight, re-selecting is a no-op
+        // that preserves the user's road/detail entries. After a failure it is
+        // the only retry affordance (there is no visible error UI yet), so
+        // re-run only the resource that failed by bumping its load id. The
+        // district reference is left untouched so consumers keyed on its
+        // identity (the map) do not react, and the road combobox is remounted
+        // only when the roads themselves are being retried.
+        const roadsFailed = state.roadsStatus === "error";
+        const zipRangesFailed = state.zipRangesStatus === "error";
+        if (!roadsFailed && !zipRangesFailed) return state;
+        return {
+          ...state,
+          roadsStatus: roadsFailed ? "loading" : state.roadsStatus,
+          roadsLoadId: roadsFailed ? state.roadsLoadId + 1 : state.roadsLoadId,
+          zipRangesStatus: zipRangesFailed ? "loading" : state.zipRangesStatus,
+          zipRangesLoadId: zipRangesFailed
+            ? state.zipRangesLoadId + 1
+            : state.zipRangesLoadId,
+        };
+      }
+      const loading: LoadStatus = action.payload ? "loading" : "idle";
       return {
         ...state,
         district: action.payload,
         road: null,
         detail: EMPTY_DETAIL,
         roads: [],
-        roadsLoading: false,
+        roadsStatus: loading,
         zipRanges: [],
+        zipRangesStatus: loading,
       };
+    }
     case "SET_ROAD":
       return {
         ...state,
@@ -82,13 +129,23 @@ function reducer(state: State, action: Action): State {
         detail: { ...state.detail, [action.field]: action.value },
       };
     case "SET_ROADS":
-      return { ...state, roads: action.payload, roadsLoading: false };
-    case "SET_ROADS_LOADING":
-      return { ...state, roadsLoading: action.payload };
+      if (state.district?.zip3 !== action.zip3) return state;
+      return { ...state, roads: action.payload, roadsStatus: "loaded" };
+    case "SET_ROADS_ERROR":
+      if (state.district?.zip3 !== action.zip3) return state;
+      return { ...state, roads: [], roadsStatus: "error" };
     case "SET_ZIP_RANGES":
-      return { ...state, zipRanges: action.payload, zipRangesLoading: false };
-    case "SET_ZIP_RANGES_LOADING":
-      return { ...state, zipRangesLoading: action.payload };
+      if (state.district?.zip3 !== action.zip3) return state;
+      return {
+        ...state,
+        zipRanges: action.payload,
+        zipRangesStatus: "loaded",
+      };
+    case "SET_ZIP_RANGES_ERROR":
+      if (state.district?.zip3 !== action.zip3) return state;
+      // Clear the ranges as well: leaving a prior district's ranges in place
+      // would let lookupZip6 compute a zip6 against the wrong district's rules.
+      return { ...state, zipRanges: [], zipRangesStatus: "error" };
     case "RESET":
       return initialState;
     default:
@@ -99,37 +156,54 @@ function reducer(state: State, action: Action): State {
 export function useAddressState() {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  // Load roads and zip ranges when district changes
+  const district = state.district;
+  const roadsLoadId = state.roadsLoadId;
+  const zipRangesLoadId = state.zipRangesLoadId;
+
+  // Roads and zip ranges load independently so a retry re-runs only the one
+  // that failed. Each effect runs when the district changes or when its own
+  // load id is bumped. SET_DISTRICT has already moved the status to "loading";
+  // the settlement actions carry zip3 so the reducer can reject any that arrive
+  // for a district the user has left, and the local `cancelled` flag skips
+  // dispatching for a superseded effect in the common case.
   useEffect(() => {
-    if (!state.district) return;
+    if (!district) return;
 
     let cancelled = false;
-    const zip3 = state.district.zip3;
-
-    dispatch({ type: "SET_ROADS_LOADING", payload: true });
-    dispatch({ type: "SET_ZIP_RANGES_LOADING", payload: true });
+    const zip3 = district.zip3;
 
     void loadRoads(zip3)
       .then((roads) => {
-        if (!cancelled) dispatch({ type: "SET_ROADS", payload: roads });
+        if (!cancelled) dispatch({ type: "SET_ROADS", zip3, payload: roads });
       })
       .catch(() => {
-        if (!cancelled) dispatch({ type: "SET_ROADS_LOADING", payload: false });
-      });
-
-    void loadZipRanges(zip3)
-      .then((ranges) => {
-        if (!cancelled) dispatch({ type: "SET_ZIP_RANGES", payload: ranges });
-      })
-      .catch(() => {
-        if (!cancelled)
-          dispatch({ type: "SET_ZIP_RANGES_LOADING", payload: false });
+        if (!cancelled) dispatch({ type: "SET_ROADS_ERROR", zip3 });
       });
 
     return () => {
       cancelled = true;
     };
-  }, [state.district]);
+  }, [district, roadsLoadId]);
+
+  useEffect(() => {
+    if (!district) return;
+
+    let cancelled = false;
+    const zip3 = district.zip3;
+
+    void loadZipRanges(zip3)
+      .then((ranges) => {
+        if (!cancelled)
+          dispatch({ type: "SET_ZIP_RANGES", zip3, payload: ranges });
+      })
+      .catch(() => {
+        if (!cancelled) dispatch({ type: "SET_ZIP_RANGES_ERROR", zip3 });
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [district, zipRangesLoadId]);
 
   // Computed: English address
   const englishAddress = useMemo(() => {

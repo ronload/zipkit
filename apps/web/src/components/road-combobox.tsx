@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import type { Road } from "@zipkit/core";
+import { FieldLabel } from "@/components/custom/field-label";
 import {
   Combobox,
   ComboboxContent,
@@ -34,6 +35,7 @@ export function RoadCombobox({
   disabled,
   loading,
 }: RoadComboboxProps) {
+  const id = useId();
   const [showError, setShowError] = useState(false);
   const [shaking, setShaking] = useState(false);
   const inputValueRef = useRef("");
@@ -49,9 +51,7 @@ export function RoadCombobox({
 
   return (
     <div className="space-y-1.5">
-      <label className="text-muted-foreground text-[11px] font-medium">
-        {"路/街"}
-      </label>
+      <FieldLabel htmlFor={loading ? undefined : id}>{"路/街"}</FieldLabel>
       {loading ? (
         <div className="border-input dark:bg-input/30 flex h-8 w-full items-center gap-2 rounded-lg border bg-transparent px-2.5">
           <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
@@ -91,6 +91,7 @@ export function RoadCombobox({
           }}
         >
           <ComboboxInput
+            id={id}
             placeholder={"請選擇路/街..."}
             disabled={disabled}
             aria-invalid={showError || undefined}
