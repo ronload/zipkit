@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { FeatureCollection } from "geojson";
 import type { Topology } from "topojson-specification";
-import type { GeoJSONSource } from "maplibre-gl";
+import type { GeoJSONSource, Map as MapLibreMap } from "maplibre-gl";
 import type { City, District } from "@zipkit/core";
 import { Map, useMap, MapControls } from "@/components/custom/map";
 import {
@@ -50,7 +50,7 @@ const themeColors = {
   },
 };
 
-function hideMapLabels(map: maplibregl.Map) {
+function hideMapLabels(map: MapLibreMap) {
   const { layers } = map.getStyle();
 
   for (const layer of layers) {
@@ -59,7 +59,7 @@ function hideMapLabels(map: maplibregl.Map) {
   }
 }
 
-function applyLayerColors(map: maplibregl.Map, theme: Theme) {
+function applyLayerColors(map: MapLibreMap, theme: Theme) {
   const colors = themeColors[theme];
   if (map.getLayer(COUNTIES_LINE)) {
     map.setPaintProperty(COUNTIES_LINE, "line-color", colors.countyLine);
@@ -86,7 +86,7 @@ function applyLayerColors(map: maplibregl.Map, theme: Theme) {
 }
 
 function ensureCountyLayers(
-  map: maplibregl.Map,
+  map: MapLibreMap,
   data: FeatureCollection,
   theme: Theme,
 ) {
@@ -112,14 +112,14 @@ function ensureCountyLayers(
 }
 
 function ensureTownLayers(
-  map: maplibregl.Map,
+  map: MapLibreMap,
   data: FeatureCollection,
   theme: Theme,
 ) {
   const colors = themeColors[theme];
   const existingSource = map.getSource(TOWNS_SOURCE);
   if (existingSource) {
-    (existingSource as GeoJSONSource).setData(data);
+    void (existingSource as GeoJSONSource).setData(data);
   } else {
     map.addSource(TOWNS_SOURCE, { type: "geojson", data });
     map.addLayer({

@@ -54,17 +54,13 @@ const CANVAS_CONTEXT_ATTRIBUTES: WebGLContextAttributes = {
 };
 
 /**
- * MapLibre GL v5 requests a `webgl2` context and falls back to `webgl`; when
- * both fail it throws synchronously from its constructor, inside an effect,
- * where nothing can catch it. Probe the same way so the map can degrade to a
- * placeholder instead of tearing down the page.
+ * MapLibre GL v6 requires a `webgl2` context. Probe for the same capability so
+ * the map can degrade to a placeholder instead of tearing down the page.
  */
 function probeWebGL(): boolean {
   try {
     const canvas = document.createElement("canvas");
-    const gl =
-      canvas.getContext("webgl2", CANVAS_CONTEXT_ATTRIBUTES) ??
-      canvas.getContext("webgl", CANVAS_CONTEXT_ATTRIBUTES);
+    const gl = canvas.getContext("webgl2", CANVAS_CONTEXT_ATTRIBUTES);
     if (!gl) return false;
     // Release the probe context immediately; browsers cap live GL contexts.
     gl.getExtension("WEBGL_lose_context")?.loseContext();
