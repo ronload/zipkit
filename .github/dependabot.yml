@@ -14,10 +14,12 @@ updates:
         update-types:
           - version-update:semver-major
     groups:
-      dev-dependencies:
-        dependency-type: development
-      production-dependencies:
-        dependency-type: production
+      # One group keeps every npm update in a single PR. With separate groups
+      # each PR rewrites pnpm-lock.yaml, and after one merges, git can merge
+      # the other without conflicts into an invalid lockfile.
+      npm-dependencies:
+        patterns:
+          - "*"
 
   - package-ecosystem: github-actions
     directory: /
