@@ -5894,5 +5894,9 @@
     }
   ],
   "id": "voyager",
-  "owner": "Carto"
+  "owner": "Carto",
+  "transition": {
+    "duration": 0,
+    "delay": 0
+  }
 }

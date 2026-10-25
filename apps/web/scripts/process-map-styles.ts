@@ -24,6 +24,7 @@ interface StyleSpecification {
   sprite?: string;
   glyphs?: string;
   layers?: Record<string, unknown>[];
+  transition?: { duration?: number; delay?: number };
 }
 
 function parseColor(
@@ -90,6 +91,9 @@ function neutralizeStyle(
   theme: "dark" | "light",
 ): StyleSpecification {
   const neutralized = { ...style };
+  // Theme switches swap styles behind a hidden map canvas. The default 300ms
+  // paint transition would still be running when the canvas fades back in.
+  neutralized.transition = { duration: 0, delay: 0 };
 
   if (neutralized.layers) {
     neutralized.layers = neutralized.layers.map((layer) => {
