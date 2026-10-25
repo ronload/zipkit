@@ -40,6 +40,7 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-mark: var(--mark);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -82,6 +83,7 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --mark: #f9452d;
 }
 
 .dark {
@@ -116,6 +118,7 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --mark: #e1f435;
 }
 
 @layer base {
@@ -193,6 +196,51 @@ body::after {
   80% {
     transform: translateX(4px);
   }
+}
+
+/* Staggered entrance. Each element sets its own --enter-delay; the
+   `backwards` fill keeps it hidden during the delay without leaving a
+   transform or filter behind once the animation ends. */
+@keyframes enter-fx {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(14px);
+  }
+}
+
+@keyframes enter-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.enter-fx {
+  animation: enter-fx 0.6s cubic-bezier(0.16, 1, 0.3, 1) var(--enter-delay, 0s)
+    backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter-fx {
+    animation-name: enter-fade;
+    animation-duration: 0.2s;
+  }
+}
+
+/* Fades the hero map out toward its left, top and bottom edges. A mask
+   rather than overlays in the background color, so whatever lies behind
+   (the page glow included) shows through unchanged. */
+@utility map-fade {
+  mask-image:
+    linear-gradient(to right, transparent, rgb(0 0 0 / 0.3) 11%, #000 22%),
+    linear-gradient(
+      to bottom,
+      transparent,
+      #000 4rem,
+      #000 calc(100% - 6rem),
+      transparent
+    );
+  mask-composite: intersect;
 }
 
 /* Stock shadcn slot overrides ─────────────────────────────────────────

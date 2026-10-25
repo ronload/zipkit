@@ -2,6 +2,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LogoIcon, GitHubIcon } from "@/components/icons";
 import { ModeToggle } from "@/components/mode-toggle";
@@ -78,29 +79,26 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <header className="border-border/50 sticky top-0 z-40 h-12 backdrop-blur-xl lg:hidden lg:border-b">
-            <div className="mx-auto flex h-full w-full max-w-3xl items-center justify-between px-4 sm:px-6 lg:max-w-6xl">
-              <div className="flex items-center gap-2">
-                <LogoIcon />
-                <span className="text-lg font-semibold tracking-tight">
+          <header className="bg-background/60 sticky top-0 z-40 w-full backdrop-blur-sm">
+            <div className="mx-auto flex h-14 w-full max-w-3xl items-center justify-between px-4 sm:px-6 lg:max-w-6xl">
+              <Link href="/" className="flex items-center gap-2.5">
+                <span className="bg-foreground text-background size-7 rounded-md p-1.5">
+                  <LogoIcon className="size-full" />
+                </span>
+                <span className="text-foreground/80 font-mono text-sm font-medium tracking-[0.5px] uppercase sm:text-base">
                   zipkit
                 </span>
-                <span className="text-muted-foreground hidden text-base sm:inline">
-                  /
-                </span>
-                <span className="text-muted-foreground hidden text-base sm:inline">
-                  {"地址英譯 & 郵遞區號"}
-                </span>
-              </div>
-              <div className="flex items-center gap-1">
+              </Link>
+              <div className="flex items-center gap-2">
                 <a
                   href="https://github.com/ronload/zipkit"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="GitHub"
-                  className="text-muted-foreground hover:bg-secondary hover:text-foreground flex h-7 w-7 items-center justify-center rounded-md transition-colors"
+                  className="text-muted-foreground hover:bg-secondary hover:text-foreground inline-flex h-8 w-8 items-center justify-center gap-1.5 rounded-full border font-mono text-xs transition-colors sm:w-auto sm:px-3"
                 >
-                  <GitHubIcon className="h-4 w-4" />
+                  <GitHubIcon className="size-3.5" />
+                  <span className="hidden sm:inline">GitHub</span>
                 </a>
                 <ModeToggle />
               </div>

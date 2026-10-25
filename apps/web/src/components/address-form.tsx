@@ -9,6 +9,7 @@ import { DistrictSelect } from "@/components/district-select";
 import { RoadCombobox } from "@/components/road-combobox";
 import { AddressDetailInputs } from "@/components/address-detail-inputs";
 import { ResultCard } from "@/components/result-card";
+import { SectionLabel } from "@/components/section-label";
 import { toSlug } from "@/lib/slug";
 
 type AddressFormProps = {
@@ -81,11 +82,7 @@ export function AddressForm({
       </div>
 
       <div>
-        <div className="mb-3">
-          <span className="text-muted-foreground text-[11px] font-medium tracking-widest uppercase">
-            {"查詢結果"}
-          </span>
-        </div>
+        <SectionLabel className="mb-3">{"查詢結果"}</SectionLabel>
         <ResultCard englishAddress={englishAddress} zip6={zip6} zip3={zip3} />
         {state.city && state.district && (
           <div className="mt-3">
