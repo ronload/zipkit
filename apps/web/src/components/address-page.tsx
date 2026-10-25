@@ -7,13 +7,12 @@ import {
   memo,
   type ComponentType,
 } from "react";
+import { ArrowUpRight } from "lucide-react";
 import type { City, District } from "@zipkit/core";
 import { useAddressState } from "@/hooks/use-address-state";
 import { toSlug } from "@/lib/slug";
 import { AddressForm } from "@/components/address-form";
-import { LogoIcon, GitHubIcon } from "@/components/icons";
-import { ModeToggle } from "@/components/mode-toggle";
-import { Card } from "@/components/ui/card";
+import { BracketBadge } from "@/components/bracket-badge";
 
 /* ------------------------------------------------------------------ */
 /*  Module-level preload                                               */
@@ -54,9 +53,13 @@ if (
 
 const MAX_RETRIES = 2;
 
+const POSTAL_DATA_URL =
+  "https://www.post.gov.tw/post/internet/Download/index.jsp?ID=2292";
+
 interface TaiwanMapProps {
   city: City | null;
   district: District | null;
+  cities: City[];
 }
 
 type MapLoadState =
@@ -117,11 +120,11 @@ function useLazyMap() {
 /* ------------------------------------------------------------------ */
 
 const MapPlaceholder = () => (
-  <div className="border-border/50 bg-muted/30 h-full w-full animate-pulse rounded-xl border" />
+  <div className="bg-muted/30 map-fade h-full w-full animate-pulse" />
 );
 
 const MapError = ({ onRetry }: { onRetry: () => void }) => (
-  <div className="border-border/50 bg-muted/10 flex h-full w-full flex-col items-center justify-center gap-3 rounded-xl border">
+  <div className="flex h-full w-full flex-col items-center justify-center gap-3">
     <p className="text-muted-foreground text-sm">地圖載入失敗</p>
     <button
       type="button"
@@ -138,12 +141,9 @@ const LazyMap = memo(function LazyMap({
   Component,
   city,
   district,
-}: {
-  Component: ComponentType<TaiwanMapProps>;
-  city: City | null;
-  district: District | null;
-}) {
-  return <Component city={city} district={district} />;
+  cities,
+}: TaiwanMapProps & { Component: ComponentType<TaiwanMapProps> }) {
+  return <Component city={city} district={district} cities={cities} />;
 });
 
 /* ------------------------------------------------------------------ */
@@ -200,52 +200,53 @@ export function AddressPage({ cities }: AddressPageProps) {
   }, [load]);
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-12 lg:grid lg:min-h-screen lg:max-w-6xl lg:grid-cols-[minmax(0,30rem)_1fr] lg:items-center lg:gap-8 lg:py-0">
-      <div>
-        <Card className="mb-6 hidden border-l lg:flex" size="sm">
-          <div className="flex items-center justify-between px-4">
-            <div className="flex items-center gap-2">
-              <LogoIcon />
-              <span className="text-lg font-semibold tracking-tight">
-                zipkit
+    <div className="@container">
+      <div className="relative mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-12 lg:flex lg:min-h-[calc(100dvh-3.5rem)] lg:max-w-6xl lg:items-center">
+        <div className="relative z-10 lg:w-[46%] lg:min-w-[440px]">
+          <div className="enter-fx [--enter-delay:100ms]">
+            <BracketBadge href={POSTAL_DATA_URL} className="ml-1">
+              {"資料來源"}
+              <span aria-hidden="true" className="opacity-40">
+                ·
               </span>
-              <span className="text-muted-foreground text-base">/</span>
-              <span className="text-muted-foreground text-base">
-                {"地址英譯 & 郵遞區號"}
-              </span>
-            </div>
-            <div className="flex items-center gap-1">
-              <a
-                href="https://github.com/ronload/zipkit"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="GitHub"
-                className="text-muted-foreground hover:bg-secondary hover:text-foreground flex h-7 w-7 items-center justify-center rounded-md transition-colors"
-              >
-                <GitHubIcon className="h-4 w-4" />
-              </a>
-              <ModeToggle />
-            </div>
+              {"中華郵政"}
+              <ArrowUpRight
+                aria-hidden="true"
+                className="size-3.5 opacity-60"
+              />
+            </BracketBadge>
           </div>
-        </Card>
-        <AddressForm cities={cities} {...addressState} />
-      </div>
+          <h1 className="enter-fx mt-6 text-[2rem] leading-[1.15] font-semibold tracking-tight [--enter-delay:180ms] sm:text-4xl lg:text-[2.5rem]">
+            {"台灣地址英譯"}
+            <br />
+            {"與 3+3 郵遞區號查詢"}
+          </h1>
+          <div className="enter-fx mt-8 [--enter-delay:320ms]">
+            <AddressForm cities={cities} {...addressState} />
+          </div>
+        </div>
 
-      {/* Always in the DOM — SSR grid is correct, zero layout shift.
-          CSS `hidden lg:block` toggles visibility without JS. */}
-      <div className="hidden lg:block">
-        <div className="sticky top-0 h-screen">
-          {mapState.status === "ready" ? (
-            <LazyMap
-              Component={mapState.Component}
-              city={addressState.state.city}
-              district={addressState.state.district}
-            />
-          ) : mapState.status === "error" ? (
-            <MapError onRetry={retry} />
-          ) : (
-            <MapPlaceholder />
-          )}
+        {/* Always in the DOM so the SSR layout is final; `hidden lg:block`
+            toggles it without JS. The panel bleeds to the viewport's right
+            edge: 100cqw is the page width, 100% the centered container's.
+            The inner wrapper sticks under the header and never outgrows the
+            viewport, so the camera only frames what is on screen. Only the
+            canvas fades out at the edges; labels and controls stay crisp. */}
+        <div className="isolate hidden lg:absolute lg:inset-y-0 lg:right-[calc((100%_-_100cqw)/2)] lg:left-[42%] lg:block">
+          <div className="[&_.maplibregl-canvas]:map-fade sticky top-14 h-[min(100%,100dvh_-_3.5rem)]">
+            {mapState.status === "ready" ? (
+              <LazyMap
+                Component={mapState.Component}
+                city={addressState.state.city}
+                district={addressState.state.district}
+                cities={cities}
+              />
+            ) : mapState.status === "error" ? (
+              <MapError onRetry={retry} />
+            ) : (
+              <MapPlaceholder />
+            )}
+          </div>
         </div>
       </div>
     </div>

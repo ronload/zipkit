@@ -8,11 +8,12 @@ export function ModeToggle() {
 
   return (
     <button
+      type="button"
       onClick={() => {
         setTheme(resolvedTheme === "light" ? "dark" : "light");
       }}
       aria-label="切換主題"
-      className="text-muted-foreground hover:bg-secondary hover:text-foreground flex h-7 w-7 items-center justify-center rounded-md transition-colors"
+      className="text-muted-foreground hover:bg-secondary hover:text-foreground relative flex size-8 items-center justify-center rounded-full border transition-colors"
     >
       <Sun className="h-3.5 w-3.5 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
       <Moon className="absolute h-3.5 w-3.5 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />

@@ -1,10 +1,12 @@
 import type { Feature, Position, Polygon, MultiPolygon } from "geojson";
-import type { LngLatBoundsLike } from "maplibre-gl";
+
+/** `[[west, south], [east, north]]` */
+export type Bounds = [[number, number], [number, number]];
 
 /**
  * Compute the bounding box of a set of GeoJSON features.
  */
-export function computeBounds(features: Feature[]): LngLatBoundsLike {
+export function computeBounds(features: Feature[]): Bounds {
   let minLng = Infinity;
   let minLat = Infinity;
   let maxLng = -Infinity;

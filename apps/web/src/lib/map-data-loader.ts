@@ -1,42 +1,32 @@
-import * as topojson from "topojson-client";
 import type { Topology } from "topojson-specification";
-import type { FeatureCollection } from "geojson";
 
-let countiesCache: FeatureCollection | null = null;
-let townsTopologyCache: Topology | null = null;
+const cache = new Map<string, Promise<Topology>>();
 
-export async function loadCountiesGeoJSON(): Promise<FeatureCollection> {
-  if (countiesCache) return countiesCache;
-
-  const res = await fetch("/data/map/counties-10t.json");
-  const topology = (await res.json()) as Topology;
-  countiesCache = topojson.feature(
-    topology,
-    topology.objects.counties,
-  ) as FeatureCollection;
-  return countiesCache;
+function loadTopology(url: string): Promise<Topology> {
+  let promise = cache.get(url);
+  if (!promise) {
+    promise = fetch(url).then(async (res) => {
+      if (!res.ok) {
+        throw new Error(`Failed to load ${url}: HTTP ${String(res.status)}`);
+      }
+      return (await res.json()) as Topology;
+    });
+    // A failed request must not stay cached, or every later call would
+    // replay the same rejection instead of trying again.
+    promise.catch(() => {
+      cache.delete(url);
+    });
+    cache.set(url, promise);
+  }
+  return promise;
 }
 
-export async function loadTownsTopology(): Promise<Topology> {
-  if (townsTopologyCache) return townsTopologyCache;
-
-  const res = await fetch("/data/map/towns-10t.json");
-  townsTopologyCache = (await res.json()) as Topology;
-  return townsTopologyCache;
+/** Counties and the national outline. */
+export function loadCountiesTopology(): Promise<Topology> {
+  return loadTopology("/data/map/counties-10t.json");
 }
 
-export function getTownsForCounty(
-  topology: Topology,
-  countyName: string,
-): FeatureCollection {
-  const allTowns = topojson.feature(
-    topology,
-    topology.objects.towns,
-  ) as FeatureCollection;
-  return {
-    type: "FeatureCollection",
-    features: allTowns.features.filter(
-      (f) => f.properties?.COUNTYNAME === countyName,
-    ),
-  };
+/** Towns, counties and the national outline. */
+export function loadTownsTopology(): Promise<Topology> {
+  return loadTopology("/data/map/towns-10t.json");
 }
